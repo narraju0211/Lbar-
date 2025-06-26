@@ -1,1 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overlay de Patrocínio L-Bar</title>
+    <style>
+        /* Variáveis CSS para fácil customização */
+        :root {
+            --l-bar-bg-color: rgba(0, 0, 0, 0.7); /* Fundo preto semi-transparente */
+            --l-bar-border-color: #00f; /* Borda azul neon (exemplo) */
+            --text-color: #fff; /* Cor do texto padrão */
+            --sponsor-logo-max-height: 80px; /* Altura máxima para logos individuais */
+            --sponsor-logo-max-width: 90%; /* Largura máxima para logos individuais */
+            --animation-duration: 0.5s; /* Duração das animações */
+        }
 
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Garante que não haja barras de rolagem */
+            background-color: transparent; /* O MAIS IMPORTANTE: fundo transparente para o OBS/Prism */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh; /* Ocupa a altura total da tela */
+            width: 100vw; /* Ocupa a largura total da tela */
+            display: flex; /* Para controlar o layout dos elementos */
+            justify-content: flex-start; /* Alinha os itens ao início (esquerda) */
+            align-items: flex-end; /* Alinha os itens ao final (inferior) */
+        }
+
+        .l-bar-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Permite clicar através da overlay quando inativa */
+            opacity: 0; /* Começa invisível */
+            transition: opacity var(--animation-duration) ease-in-out;
+            display: flex; /* Para organizar as barras lateral e inferior */
+            justify-content: flex-start;
+            align-items: flex-end;
+        }
+
+        .l-bar-container.active {
+            opacity: 1; /* Torna visível quando ativo */
+            pointer-events: all; /* Permite interação quando ativo (se houver) */
+        }
+
+        .l-bar-left, .l-bar-bottom {
+            background-color: var(--l-bar-bg-color);
+            border: 1px solid var(--l-bar-border-color);
+            box-sizing: border-box; /* Inclui padding e borda na largura/altura */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-color);
+            overflow: hidden; /* Esconde conteúdo que vaze */
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5); /* Sombra neon */
+        }
+
+        .l-bar-left {
+            width: 200px; /* Largura da barra lateral - AJUSTAR FUTURAMENTE */
+            height: calc(100% - 100px); /* Altura: 100% menos a altura da barra inferior - AJUSTAR */
+            position: absolute; /* Posição absoluta para o canto superior esquerdo */
+            top: 0;
+            left: 0;
+            flex-direction: column; /* Conteúdo vertical na lateral */
+            padding: 15px 5px; /* Padding interno */
+        }
+
+        .l-bar-bottom {
+            height: 100px; /* Altura da barra inferior - AJUSTAR FUTURAMENTE */
+            width: 100%; /* Largura total */
+            position: absolute; /* Posição absoluta para a base */
+            bottom: 0;
+            left: 0;
+            padding: 5px 15px; /* Padding interno */
+        }
+
+        /* Conteúdo dos patrocinadores */
+        .sponsor-content {
+            display: flex;
+            flex-direction: column; /* Para empilhar logos e texto */
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%; /* Ocupa todo o espaço da barra */
+            gap: 10px; /* Espaço entre os elementos */
+            text-align: center;
+            font-size: 1.2em;
+            text-shadow: 0 0 5px rgba(0,0,0,0.8);
+        }
+
+        .sponsor-content img {
+            max-height: var(--sponsor-logo-max-height);
+            max-width: var(--sponsor-logo-max-width);
+            object-fit: contain; /* Garante que a logo caiba sem distorcer */
+            filter: drop-shadow(0 0 3px rgba(255,255,255,0.4)); /* Sombra suave para a logo */
+        }
+
+        .sponsor-text {
+            font-size: 0.9em;
+            word-break: break-word; /* Quebra palavras longas */
+            padding: 0 5px;
+            max-height: 40%; /* Limita a altura do texto */
+            overflow: hidden; /* Esconde texto que vaze */
+        }
+
+        /* Classes para animação de entrada/saída (futuramente) */
+        /* .l-bar-left.animate-in { animation: slideInLeft var(--animation-duration) forwards; } */
+        /* .l-bar-bottom.animate-in { animation: slideInBottom var(--animation-duration) forwards; } */
+        /* .l-bar-left.animate-out { animation: slideOutLeft var(--animation-duration) forwards; } */
+        /* .l-bar-bottom.animate-out { animation: slideOutBottom var(--animation-duration) forwards; } */
+
+        /* Animações (exemplo - vamos refinar isso depois) */
+        /* @keyframes slideInLeft {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+        @keyframes slideOutLeft {
+            from { transform: translateX(0); }
+            to { transform: translateX(-100%); }
+        }
+        @keyframes slideInBottom {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        @keyframes slideOutBottom {
+            from { transform: translateY(0); }
+            to { transform: translateY(100%); }
+        } */
+
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+    <div class="l-bar-container" id="lBarContainer">
+        <div class="l-bar-left" id="lBarLeft">
+            <div class="sponsor-content" id="leftSponsorContent">
+                </div>
+        </div>
+        <div class="l-bar-bottom" id="lBarBottom">
+            <div class="sponsor-content" id="bottomSponsorContent">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        // ** SEU FIREBASE CONFIG ESTÁ AQUI **
+        const firebaseConfig = {
+          apiKey: "SUA_API_KEY",
+          authDomain: "SEU_AUTH_DOMAIN",
+          databaseURL: "SUA_DATABASE_URL",
+          projectId: "SEU_PROJECT_ID",
+          storageBucket: "SEU_STORAGE_BUCKET",
+          messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+          appId: "SEU_APP_ID"
+        };
+
+        // Inicialize o Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = app.database();
+        const sponsorStateRef = database.ref('sponsorOverlayState'); // Novo nó no Firebase
+
+        let sponsorOverlayState = {
+            isVisible: false,
+            // Futuramente: dados dos patrocinadores
+            // leftSponsor: { logo: '', text: '' },
+            // bottomSponsor: { logo: '', text: '' }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            sponsorStateRef.on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    sponsorOverlayState = snapshot.val();
+                    renderOverlay();
+                }
+            }, (error) => {
+                console.error("Erro ao ler dados do Firebase:", error);
+            });
+        });
+
+        function renderOverlay() {
+            const lBarContainer = document.getElementById('lBarContainer');
+            if (sponsorOverlayState.isVisible) {
+                lBarContainer.classList.add('active');
+            } else {
+                lBarContainer.classList.remove('active');
+            }
+
+            // // Futuramente, quando tivermos os dados dos patrocinadores:
+            // const leftSponsorContent = document.getElementById('leftSponsorContent');
+            // const bottomSponsorContent = document.getElementById('bottomSponsorContent');
+
+            // if (sponsorOverlayState.leftSponsor && sponsorOverlayState.leftSponsor.logo) {
+            //     leftSponsorContent.innerHTML = `
+            //         <img src="${sponsorOverlayState.leftSponsor.logo}" alt="Logo Patrocinador Esquerda">
+            //         ${sponsorOverlayState.leftSponsor.text ? `<span class="sponsor-text">${sponsorOverlayState.leftSponsor.text}</span>` : ''}
+            //     `;
+            // } else {
+            //     leftSponsorContent.innerHTML = '';
+            // }
+
+            // if (sponsorOverlayState.bottomSponsor && sponsorOverlayState.bottomSponsor.logo) {
+            //     bottomSponsorContent.innerHTML = `
+            //         <img src="${sponsorOverlayState.bottomSponsor.logo}" alt="Logo Patrocinador Inferior">
+            //         ${sponsorOverlayState.bottomSponsor.text ? `<span class="sponsor-text">${sponsorOverlayState.bottomSponsor.text}</span>` : ''}
+            //     `;
+            // } else {
+            //     bottomSponsorContent.innerHTML = '';
+            // }
+        }
+    </script>
+</body>
+</html>

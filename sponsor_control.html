@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Patrocínio L-Bar</title>
     <style>
+        /* Estilos CSS para o layout e aparência do painel de controle */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 20px;
@@ -204,21 +205,24 @@
 
     <script>
         // ** SEU FIREBASE CONFIG ESTÁ AQUI **
+        // Certifique-se de que estas são as suas credenciais EXATAS do projeto Firebase
         const firebaseConfig = {
-          apiKey: "AIzaSyC-***************************",
-          authDomain: "***************.firebaseapp.com",
-          databaseURL: "https://***************-default-rtdb.firebaseio.com",
-          projectId: "***************",
-          storageBucket: "***************.appspot.com",
-          messagingSenderId: "************",
-          appId: "1:************:web:**********************"
+          apiKey: "AIzaSyC-***************************", // Sua API Key
+          authDomain: "***************.firebaseapp.com", // Seu Auth Domain
+          databaseURL: "https://***************-default-rtdb.firebaseio.com", // Sua Database URL
+          projectId: "***************", // Seu Project ID
+          storageBucket: "***************.appspot.com", // Seu Storage Bucket (mesmo que não usado, manter por completude)
+          messagingSenderId: "************", // Seu Messaging Sender ID
+          appId: "1:************:web:**********************" // Seu App ID
         };
 
-        // Inicialize o Firebase
+        // Inicializa o Firebase com suas configurações
         const app = firebase.initializeApp(firebaseConfig);
-        const database = app.database();
+        const database = app.database(); // Referência ao Realtime Database
+        // Refere-se ao nó 'sponsorOverlayState' no Realtime Database, onde os dados da overlay serão salvos
         const sponsorStateRef = database.ref('sponsorOverlayState');
 
+        // Referências aos elementos HTML
         const toggleVisibilityBtn = document.getElementById('toggleVisibilityBtn');
         const visibilityStatus = document.getElementById('visibilityStatus');
 
@@ -230,18 +234,18 @@
         const bottomLogoPreview = document.getElementById('bottomLogoPreview');
         const bottomSponsorTextarea = document.getElementById('bottomSponsorText');
 
-        // Pré-visualização de Logos
+        // Event Listeners para pré-visualização das logos selecionadas pelo usuário
         leftSponsorLogoInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
+            const file = event.target.files[0]; // Pega o primeiro arquivo selecionado
             if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    leftLogoPreview.src = e.target.result;
-                    leftLogoPreview.style.display = 'block';
+                const reader = new FileReader(); // Objeto para ler o conteúdo do arquivo
+                reader.onload = (e) => { // Quando o arquivo for lido
+                    leftLogoPreview.src = e.target.result; // Define a fonte da imagem de pré-visualização
+                    leftLogoPreview.style.display = 'block'; // Mostra a imagem
                 };
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(file); // Lê o arquivo como uma URL de dados (Base64)
             } else {
-                leftLogoPreview.style.display = 'none';
+                leftLogoPreview.style.display = 'none'; // Esconde a imagem se nenhum arquivo for selecionado
                 leftLogoPreview.src = '';
             }
         });
@@ -261,13 +265,15 @@
             }
         });
 
-        // Listener para o estado da overlay no Firebase
+        // Listener para mudanças nos dados da overlay no Firebase
+        // Este evento é disparado toda vez que os dados em 'sponsorOverlayState' mudam
         sponsorStateRef.on('value', (snapshot) => {
-            const state = snapshot.val();
+            const state = snapshot.val(); // Obtém os dados do snapshot
             if (state && typeof state.isVisible !== 'undefined') {
-                updateToggleButton(state.isVisible);
-                updateVisibilityStatus(state.isVisible);
-                // Preencher campos com dados atuais se existirem
+                updateToggleButton(state.isVisible); // Atualiza o estado do botão Ligar/Desligar
+                updateVisibilityStatus(state.isVisible); // Atualiza o texto de visibilidade
+
+                // Preenche os campos de texto e pré-visualiza as logos com os dados atuais do Firebase
                 if (state.leftSponsor) {
                     leftSponsorTextarea.value = state.leftSponsor.text || '';
                     if (state.leftSponsor.logo) {
@@ -275,13 +281,14 @@
                         leftLogoPreview.style.display = 'block';
                     } else {
                         leftLogoPreview.style.display = 'none';
-                        leftSponsorLogoInput.value = ''; // Limpa o input de arquivo
+                        leftSponsorLogoInput.value = ''; // Limpa o input de arquivo visualmente
                     }
-                } else {
+                } else { // Se não há dados para leftSponsor, limpa os campos
                     leftSponsorTextarea.value = '';
                     leftLogoPreview.style.display = 'none';
-                    leftSponsorLogoInput.value = ''; // Limpa o input de arquivo
+                    leftSponsorLogoInput.value = '';
                 }
+
                 if (state.bottomSponsor) {
                     bottomSponsorTextarea.value = state.bottomSponsor.text || '';
                     if (state.bottomSponsor.logo) {
@@ -289,12 +296,12 @@
                         bottomLogoPreview.style.display = 'block';
                     } else {
                         bottomLogoPreview.style.display = 'none';
-                        bottomSponsorLogoInput.value = ''; // Limpa o input de arquivo
+                        bottomSponsorLogoInput.value = '';
                     }
-                } else {
+                } else { // Se não há dados para bottomSponsor, limpa os campos
                     bottomSponsorTextarea.value = '';
                     bottomLogoPreview.style.display = 'none';
-                    bottomSponsorLogoInput.value = ''; // Limpa o input de arquivo
+                    bottomSponsorLogoInput.value = '';
                 }
 
             } else {
@@ -303,25 +310,26 @@
                 updateVisibilityStatus(false);
             }
         }, (error) => {
+            // Em caso de erro na leitura do Firebase
             console.error("Erro ao ler dados do Firebase:", error);
             visibilityStatus.textContent = "Erro de conexão";
             toggleVisibilityBtn.textContent = "Erro";
-            toggleVisibilityBtn.disabled = true;
+            toggleVisibilityBtn.disabled = true; // Desabilita o botão em caso de erro
         });
 
-        // Função para atualizar o botão de visibilidade
+        // Função para atualizar a aparência do botão Ligar/Desligar
         function updateToggleButton(isVisible) {
             if (isVisible) {
                 toggleVisibilityBtn.textContent = 'Desligar Overlay';
-                toggleVisibilityBtn.classList.add('active');
+                toggleVisibilityBtn.classList.add('active'); // Adiciona classe para estilo 'vermelho'
             } else {
                 toggleVisibilityBtn.textContent = 'Ligar Overlay';
-                toggleVisibilityBtn.classList.remove('active');
+                toggleVisibilityBtn.classList.remove('active'); // Remove classe para estilo 'verde'
             }
-            toggleVisibilityBtn.disabled = false;
+            toggleVisibilityBtn.disabled = false; // Habilita o botão
         }
 
-        // Função para atualizar o status de visibilidade
+        // Função para atualizar o texto de status da visibilidade
         function updateVisibilityStatus(isVisible) {
             if (isVisible) {
                 visibilityStatus.innerHTML = '<span class="on">LIGADA</span>';
@@ -330,30 +338,63 @@
             }
         }
 
-        // Função para ligar/desligar a overlay
+        // Event Listener para o botão Ligar/Desligar Overlay
         toggleVisibilityBtn.addEventListener('click', () => {
+            // Pega o estado atual da overlay (se a classe 'active' está presente)
             const currentState = toggleVisibilityBtn.classList.contains('active');
+            // Atualiza o valor de 'isVisible' no Firebase para o oposto do estado atual
             sponsorStateRef.update({ isVisible: !currentState })
                 .then(() => console.log('Visibilidade atualizada!'))
                 .catch(error => console.error('Erro ao atualizar visibilidade:', error));
         });
 
-        // Função para converter arquivo para Base64
+        // Função principal para converter um objeto File para uma string Base64
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
+                // Valida se um arquivo foi de fato fornecido
+                if (!file) {
+                    console.error("fileToBase64: Arquivo é nulo ou indefinido.");
+                    // Este alert pode ser muito frequente, considere remover após o debug
+                    // alert("Erro interno: Arquivo de imagem não foi selecionado corretamente."); 
+                    return reject("Arquivo inválido: nenhum arquivo selecionado.");
+                }
+                // Valida se o objeto é de fato um File/Blob
+                if (!(file instanceof Blob)) {
+                    console.error("fileToBase64: Objeto não é uma instância de Blob/File.", file);
+                    // alert("Erro interno: Objeto selecionado não é um arquivo válido.");
+                    return reject("Arquivo inválido: objeto não é um arquivo.");
+                }
+                console.log("fileToBase64: Tentando ler arquivo de tipo:", file.type, "tamanho:", file.size);
+
+                const reader = new FileReader(); // Cria um novo FileReader
+                reader.readAsDataURL(file); // Inicia a leitura do arquivo como uma URL de dados (Base64)
+
+                reader.onload = () => { // Função executada quando a leitura é concluída com sucesso
+                    console.log("fileToBase64: Leitura concluída com sucesso.");
+                    resolve(reader.result); // Resolve a promessa com a string Base64
+                };
+
+                reader.onerror = (error) => { // Função executada se houver um erro na leitura
+                    console.error("fileToBase64: Erro ao ler arquivo:", error);
+                    alert("Erro ao ler o arquivo de imagem. Pode estar corrompido ou ser um formato inválido.");
+                    reject(error);
+                };
+
+                reader.onabort = () => { // Função executada se a leitura for abortada
+                    console.warn("fileToBase64: Leitura do arquivo abortada.");
+                    alert("Leitura do arquivo de imagem foi abortada.");
+                    reject("Leitura abortada.");
+                };
             });
         }
 
-        // Função para definir os dados do patrocinador
+        // Função assíncrona para definir (atualizar) os dados de um patrocinador no Firebase
         async function setSponsor(slot) {
-            let logoFile;
-            let textValue;
-            let logoPreviewElement;
+            let logoFile; // Variável para o objeto File da logo
+            let textValue; // Variável para o texto do patrocinador
+            let logoPreviewElement; // Referência ao elemento <img> de pré-visualização
 
+            // Atribui os valores e referências corretos com base no 'slot' (left ou bottom)
             if (slot === 'left') {
                 logoFile = leftSponsorLogoInput.files[0];
                 textValue = leftSponsorTextarea.value;
@@ -364,43 +405,47 @@
                 logoPreviewElement = bottomLogoPreview;
             }
 
-            let logoBase64 = '';
+            let logoBase64 = ''; // Variável para armazenar a string Base64 da logo
 
-            // Se um novo arquivo de logo foi selecionado
+            // Processa a logo: se um novo arquivo foi selecionado, converte para Base64
             if (logoFile) {
-                // Checagem de tamanho do arquivo (opcional, mas recomendado)
-                const maxSizeKB = 500; // Por exemplo, 500KB. Ajuste se precisar.
+                // Checagem de tamanho do arquivo para evitar estouro no Realtime Database
+                const maxSizeKB = 500; // Limite de 500KB. Imagens maiores podem causar problemas.
                 if (logoFile.size > maxSizeKB * 1024) {
                     alert(`O arquivo da logo é muito grande (${(logoFile.size / 1024).toFixed(0)}KB). O limite recomendado é ${maxSizeKB}KB para evitar problemas com o Firebase Realtime Database.`);
-                    return; // Aborta a operação
+                    return; // Aborta a operação se o arquivo for muito grande
                 }
                 try {
-                    logoBase64 = await fileToBase64(logoFile);
+                    console.log(`setSponsor: Tentando converter logo para o slot ${slot}.`);
+                    logoBase64 = await fileToBase64(logoFile); // Chama a função de conversão assíncrona
                     console.log(`Logo do slot ${slot} convertida para Base64.`);
                 } catch (error) {
                     console.error(`Erro ao converter logo para Base64 para o slot ${slot}:`, error);
-                    alert(`Erro ao converter logo para o slot ${slot}. Verifique o console.`);
-                    return;
+                    // Alerta mais específico para o usuário
+                    alert(`Erro ao converter logo para o slot ${slot}: ${error.message || error}. Por favor, tente com outro arquivo.`);
+                    return; // Aborta a operação em caso de erro na conversão
                 }
             } else if (logoPreviewElement.src && logoPreviewElement.style.display !== 'none' && !logoPreviewElement.src.startsWith('blob:')) {
-                // Se não há novo arquivo, mas há uma logo sendo exibida (já do Firebase)
+                // Se nenhum novo arquivo foi selecionado, mas uma logo já está sendo exibida (do Firebase ou uma pré-visualização)
+                // Usamos a URL da imagem atual para não perdê-la
                 logoBase64 = logoPreviewElement.src;
             }
 
+            // Objeto com os dados a serem atualizados no Firebase
             const updateData = {};
-            updateData[`${slot}Sponsor`] = {
-                logo: logoBase64, // Agora é a string Base64
-                text: textValue
+            updateData[`${slot}Sponsor`] = { // Ex: 'leftSponsor' ou 'bottomSponsor'
+                logo: logoBase64, // A string Base64 da logo (ou vazia se não houver)
+                text: textValue // O texto do patrocinador
             };
 
+            // Atualiza os dados no Firebase Realtime Database
             sponsorStateRef.update(updateData)
                 .then(() => {
                     alert(`Patrocinador da ${slot === 'left' ? 'Barra Lateral Esquerda' : 'Barra Inferior'} atualizado com sucesso!`);
-                    // Não limpa o input de arquivo aqui para o usuário poder ver que a logo está definida
                 })
                 .catch(error => {
                     console.error(`Erro ao atualizar patrocinador do slot ${slot}:`, error);
-                    alert(`Erro ao atualizar patrocinador do slot ${slot}. Verifique o console.`);
+                    alert(`Erro ao atualizar patrocinador do slot ${slot}. Verifique o console do navegador para detalhes.`);
                 });
         }
     </script>

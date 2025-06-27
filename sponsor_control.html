@@ -55,7 +55,7 @@
 
         input[type="text"],
         input[type="number"],
-        textarea { /* input type="file" removido */
+        textarea {
             width: calc(100% - 20px);
             padding: 10px;
             border: 1px solid #ddd;
@@ -67,6 +67,29 @@
         textarea {
             resize: vertical;
             min-height: 80px;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            box-sizing: border-box;
+            background-color: #f9f9f9;
+        }
+
+        .preview-logo {
+            margin-top: 10px;
+            text-align: center;
+        }
+        .preview-logo img {
+            max-width: 150px;
+            max-height: 150px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            padding: 5px;
+            background-color: #fff;
         }
 
         button {
@@ -99,9 +122,6 @@
         button.set-sponsor-button:hover {
             background-color: #0056b3;
         }
-
-        /* .preview-logo removido */
-        /* .current-visibility e .note mantidos */
 
         .current-visibility {
             text-align: center;
@@ -143,7 +163,6 @@
             font-size: 1.1em;
         }
     </style>
-    <!-- Importa as bibliotecas do Firebase App e Realtime Database. -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
@@ -160,12 +179,18 @@
     <div class="container sponsor-slots">
         <div class="section-title">Patrocinadores</div>
 
-        <!-- Seção para o Patrocinador da Barra Lateral Esquerda -->
         <div class="slot">
             <div class="slot-header">
-                <h3>Barra Lateral Esquerda (APENAS TEXTO)</h3>
+                <h3>Barra Lateral Esquerda</h3>
             </div>
-            <!-- Campo de logo removido -->
+            <div class="form-group">
+                <label for="leftSponsorLogo">Logo do Patrocinador:</label>
+                <input type="file" id="leftSponsorLogo" accept="image/*">
+                <div class="preview-logo">
+                    <img id="leftLogoPreview" src="" alt="Pré-visualização da Logo Esquerda" style="display: none;">
+                </div>
+                <span class="note">Formatos recomendados: PNG, JPG. Tamanho máximo: 500KB.</span>
+            </div>
             <div class="form-group">
                 <label for="leftSponsorText">Texto do Patrocinador:</label>
                 <textarea id="leftSponsorText" placeholder="Ex: Patrocínio Master"></textarea>
@@ -173,12 +198,18 @@
             <button class="set-sponsor-button" onclick="setSponsor('left')">Atualizar Patrocinador Esquerda</button>
         </div>
 
-        <!-- Seção para o Patrocinador da Barra Inferior -->
         <div class="slot">
             <div class="slot-header">
-                <h3>Barra Inferior (APENAS TEXTO)</h3>
+                <h3>Barra Inferior</h3>
             </div>
-            <!-- Campo de logo removido -->
+            <div class="form-group">
+                <label for="bottomSponsorLogo">Logo do Patrocinador:</label>
+                <input type="file" id="bottomSponsorLogo" accept="image/*">
+                <div class="preview-logo">
+                    <img id="bottomLogoPreview" src="" alt="Pré-visualização da Logo Inferior" style="display: none;">
+                </div>
+                <span class="note">Formatos recomendados: PNG, JPG. Tamanho máximo: 500KB.</span>
+            </div>
             <div class="form-group">
                 <label for="bottomSponsorText">Texto do Patrocinador:</label>
                 <textarea id="bottomSponsorText" placeholder="Ex: Apoio: Sua Marca"></textarea>
@@ -209,11 +240,44 @@
         const toggleVisibilityBtn = document.getElementById('toggleVisibilityBtn');
         const visibilityStatus = document.getElementById('visibilityStatus');
 
-        // Inputs de logo e previews removidos
+        const leftSponsorLogoInput = document.getElementById('leftSponsorLogo');
+        const leftLogoPreview = document.getElementById('leftLogoPreview');
         const leftSponsorTextarea = document.getElementById('leftSponsorText');
+
+        const bottomSponsorLogoInput = document.getElementById('bottomSponsorLogo');
+        const bottomLogoPreview = document.getElementById('bottomLogoPreview');
         const bottomSponsorTextarea = document.getElementById('bottomSponsorText');
 
-        // Event Listeners para pré-visualização das logos removidos
+        // Event Listeners para pré-visualização das logos
+        leftSponsorLogoInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    leftLogoPreview.src = e.target.result;
+                    leftLogoPreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                leftLogoPreview.src = '';
+                leftLogoPreview.style.display = 'none';
+            }
+        });
+
+        bottomSponsorLogoInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    bottomLogoPreview.src = e.target.result;
+                    bottomLogoPreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                bottomLogoPreview.src = '';
+                bottomLogoPreview.style.display = 'none';
+            }
+        });
 
         // Listener para mudanças nos dados da overlay no Firebase
         sponsorStateRef.on('value', (snapshot) => {
@@ -222,22 +286,47 @@
                 updateToggleButton(state.isVisible);
                 updateVisibilityStatus(state.isVisible);
 
-                // Preenche os campos de texto com os dados atuais do Firebase
+                // Preenche os campos de texto e pré-visualiza as logos com os dados atuais do Firebase
                 if (state.leftSponsor) {
                     leftSponsorTextarea.value = state.leftSponsor.text || '';
+                    if (state.leftSponsor.logo) {
+                        leftLogoPreview.src = state.leftSponsor.logo;
+                        leftLogoPreview.style.display = 'block';
+                    } else {
+                        leftLogoPreview.src = '';
+                        leftLogoPreview.style.display = 'none';
+                    }
                 } else {
                     leftSponsorTextarea.value = '';
+                    leftLogoPreview.src = '';
+                    leftLogoPreview.style.display = 'none';
                 }
 
                 if (state.bottomSponsor) {
                     bottomSponsorTextarea.value = state.bottomSponsor.text || '';
+                    if (state.bottomSponsor.logo) {
+                        bottomLogoPreview.src = state.bottomSponsor.logo;
+                        bottomLogoPreview.style.display = 'block';
+                    } else {
+                        bottomLogoPreview.src = '';
+                        bottomLogoPreview.style.display = 'none';
+                    }
                 } else {
                     bottomSponsorTextarea.value = '';
+                    bottomLogoPreview.src = '';
+                    bottomLogoPreview.style.display = 'none';
                 }
 
             } else {
+                // Estado inicial se não houver dados no Firebase
                 updateToggleButton(false);
                 updateVisibilityStatus(false);
+                leftSponsorTextarea.value = '';
+                leftLogoPreview.src = '';
+                leftLogoPreview.style.display = 'none';
+                bottomSponsorTextarea.value = '';
+                bottomLogoPreview.src = '';
+                bottomLogoPreview.style.display = 'none';
             }
         }, (error) => {
             console.error("Erro ao ler dados do Firebase:", error);
@@ -272,34 +361,52 @@
                 .catch(error => console.error('Erro ao atualizar visibilidade:', error));
         });
 
-        // Função fileToBase64 removida completamente
+        // Função para converter arquivo de imagem para Base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
 
         // Função assíncrona para definir (atualizar) os dados de um patrocinador no Firebase
         async function setSponsor(slot) {
-            let textValue;
+            let logoFile, textValue;
 
             if (slot === 'left') {
+                logoFile = leftSponsorLogoInput.files[0];
                 textValue = leftSponsorTextarea.value;
             } else { // slot === 'bottom'
+                logoFile = bottomSponsorLogoInput.files[0];
                 textValue = bottomSponsorTextarea.value;
             }
 
-            // O logo agora é sempre uma string vazia, pois não estamos usando imagens
-            const logo = ''; 
+            let logoBase64 = '';
+            if (logoFile) {
+                try {
+                    logoBase64 = await fileToBase64(logoFile);
+                } catch (error) {
+                    console.error("Erro ao converter imagem para Base64:", error);
+                    alert("Erro ao carregar a imagem. Tente novamente.");
+                    return;
+                }
+            }
 
             const updateData = {};
             updateData[`${slot}Sponsor`] = {
-                logo: logo, 
+                logo: logoBase64, // Salva a imagem em Base64
                 text: textValue
             };
 
             sponsorStateRef.update(updateData)
                 .then(() => {
-                    alert(`Patrocinador da ${slot === 'left' ? 'Barra Lateral Esquerda' : 'Barra Inferior'} atualizado com sucesso! (APENAS TEXTO)`);
+                    alert(`Patrocinador da ${slot === 'left' ? 'Barra Lateral Esquerda' : 'Barra Inferior'} atualizado com sucesso!`);
                 })
                 .catch(error => {
                     console.error(`Erro ao atualizar patrocinador do slot ${slot}:`, error);
-                    alert(`Erro ao atualizar patrocinador do slot ${slot} no Firebase (APENAS TEXTO). Verifique o console.`);
+                    alert(`Erro ao atualizar patrocinador do slot ${slot} no Firebase. Verifique o console.`);
                 });
         }
     </script>

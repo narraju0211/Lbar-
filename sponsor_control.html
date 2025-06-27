@@ -201,7 +201,7 @@
         </div>
         <div class="form-group">
             <label for="contactInfo">Contato e Atendimento (em destaque):</label>
-            <textarea id="contactInfo" placeholder="Ex: (XX) XXXX-XXXX, www.site.com.br, Seg-Sex 9h-18h"></textarea>
+            <textarea id="contactInfo" placeholder="Ex: (XX) XXXX-XXXX, www.site.com.br, Seg-Mex 9h-18h"></textarea>
         </div>
         <div class="form-group">
             <label for="backgroundImage">Imagem de Fundo da Barra (Unificada):</label>
@@ -249,6 +249,7 @@
         const backgroundOpacitySlider = document.getElementById('backgroundOpacity');
         const opacityValueSpan = document.getElementById('opacityValue');
 
+        // VALOR CORRIGIDO: O limite máximo para arquivos, agora 500KB
         const MAX_FILE_SIZE = 500 * 1024; // 500KB - Ajustado para o limite recomendado do Firebase
 
         function setupImageInput(inputElement, previewElement) {
@@ -256,7 +257,8 @@
                 const file = event.target.files?.[0];
                 if (file) {
                     if (file.size > MAX_FILE_SIZE) {
-                        alert(`O arquivo selecionado (${(file.size / (1024 * 1024)).toFixed(2)} MB) é muito grande. Máximo: ${(MAX_FILE_SIZE / 1024).toFixed(0)}KB.`);
+                        // Mensagem de alerta atualizada para mostrar o limite em KB
+                        alert(`O arquivo selecionado (${(file.size / 1024).toFixed(0)}KB) é muito grande. Máximo: ${(MAX_FILE_SIZE / 1024).toFixed(0)}KB.`);
                         inputElement.value = ''; // Limpa o campo de seleção de arquivo
                         previewElement.src = '';
                         previewElement.style.display = 'none';

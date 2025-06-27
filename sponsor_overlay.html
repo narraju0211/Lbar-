@@ -110,7 +110,7 @@
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-</head>
+    </head>
 <body>
     <div class="l-bar-container" id="lBarContainer">
         <div class="l-bar-left" id="lBarLeft">
@@ -142,9 +142,8 @@
 
         let sponsorOverlayState = {
             isVisible: false,
-            // Futuramente: dados dos patrocinadores
-            // leftSponsor: { logo: '', text: '' },
-            // bottomSponsor: { logo: '', text: '' }
+            leftSponsor: { logo: '', text: '' },
+            bottomSponsor: { logo: '', text: '' }
         };
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -166,27 +165,28 @@
                 lBarContainer.classList.remove('active');
             }
 
-            // // Futuramente, quando tivermos os dados dos patrocinadores:
-            // const leftSponsorContent = document.getElementById('leftSponsorContent');
-            // const bottomSponsorContent = document.getElementById('bottomSponsorContent');
+            const leftSponsorContent = document.getElementById('leftSponsorContent');
+            const bottomSponsorContent = document.getElementById('bottomSponsorContent');
 
-            // if (sponsorOverlayState.leftSponsor && sponsorOverlayState.leftSponsor.logo) {
-            //     leftSponsorContent.innerHTML = `
-            //         <img src="${sponsorOverlayState.leftSponsor.logo}" alt="Logo Patrocinador Esquerda">
-            //         ${sponsorOverlayState.leftSponsor.text ? `<span class="sponsor-text">${sponsorOverlayState.leftSponsor.text}</span>` : ''}
-            //     `;
-            // } else {
-            //     leftSponsorContent.innerHTML = '';
-            // }
+            // Renderiza o patrocinador da esquerda
+            if (sponsorOverlayState.leftSponsor && sponsorOverlayState.leftSponsor.logo) {
+                leftSponsorContent.innerHTML = `
+                    <img src="${sponsorOverlayState.leftSponsor.logo}" alt="Logo Patrocinador Esquerda">
+                    ${sponsorOverlayState.leftSponsor.text ? `<span class="sponsor-text">${sponsorOverlayState.leftSponsor.text}</span>` : ''}
+                `;
+            } else {
+                leftSponsorContent.innerHTML = '';
+            }
 
-            // if (sponsorOverlayState.bottomSponsor && sponsorOverlayState.bottomSponsor.logo) {
-            //     bottomSponsorContent.innerHTML = `
-            //         <img src="${sponsorOverlayState.bottomSponsor.logo}" alt="Logo Patrocinador Inferior">
-            //         ${sponsorOverlayState.bottomSponsor.text ? `<span class="sponsor-text">${sponsorOverlayState.bottomSponsor.text}</span>` : ''}
-            //     `;
-            // } else {
-            //     bottomSponsorContent.innerHTML = '';
-            // }
+            // Renderiza o patrocinador de baixo
+            if (sponsorOverlayState.bottomSponsor && sponsorOverlayState.bottomSponsor.logo) {
+                bottomSponsorContent.innerHTML = `
+                    <img src="${sponsorOverlayState.bottomSponsor.logo}" alt="Logo Patrocinador Inferior">
+                    ${sponsorOverlayState.bottomSponsor.text ? `<span class="sponsor-text">${sponsorOverlayState.bottomSponsor.text}</span>` : ''}
+                `;
+            } else {
+                bottomSponsorContent.innerHTML = '';
+            }
         }
     </script>
 </body>

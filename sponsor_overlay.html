@@ -10,7 +10,8 @@
             --l-bar-bg-color: rgba(0, 0, 0, 0.7); /* Fundo preto semi-transparente */
             --l-bar-border-color: #00f; /* Borda azul neon (exemplo) */
             --text-color: #fff; /* Cor do texto padrão */
-            /* Váriaveis de logo removidas */
+            --logo-max-height-left: 80px; /* Altura máxima da logo na barra lateral */
+            --logo-max-height-bottom: 70px; /* Altura máxima da logo na barra inferior */
             --animation-duration: 0.5s; /* Duração das animações de fade in/out */
         }
 
@@ -77,21 +78,32 @@
             padding: 5px 15px; /* Padding interno */
         }
 
-        /* Estilos para o conteúdo dos patrocinadores (apenas texto) */
+        /* Estilos para o conteúdo dos patrocinadores (logo e texto) */
         .sponsor-content {
             display: flex;
-            flex-direction: column; /* Para empilhar texto */
+            flex-direction: column; /* Para empilhar logo e texto */
             justify-content: center;
             align-items: center;
             width: 100%;
             height: 100%; /* Ocupa todo o espaço disponível na barra */
-            gap: 10px; /* Espaço entre elementos, se houver */
+            gap: 10px; /* Espaço entre logo e texto */
             text-align: center;
             font-size: 1.2em;
             text-shadow: 0 0 5px rgba(0,0,0,0.8); /* Sombra para o texto */
         }
 
-        /* img removido */
+        .sponsor-content img {
+            max-width: 90%; /* Largura máxima da imagem dentro do seu contêiner */
+            object-fit: contain; /* Garante que a imagem seja contida sem cortar */
+        }
+
+        .l-bar-left .sponsor-content img {
+            max-height: var(--logo-max-height-left); /* Altura máxima para logo na barra lateral */
+        }
+
+        .l-bar-bottom .sponsor-content img {
+            max-height: var(--logo-max-height-bottom); /* Altura máxima para logo na barra inferior */
+        }
 
         .sponsor-text {
             font-size: 1.1em; /* Tamanho da fonte para o texto do patrocinador */
@@ -102,7 +114,6 @@
         }
 
     </style>
-    <!-- Importa as bibliotecas do Firebase App e Realtime Database. -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
@@ -110,13 +121,11 @@
     <div class="l-bar-container" id="lBarContainer">
         <div class="l-bar-left" id="lBarLeft">
             <div class="sponsor-content" id="leftSponsorContent">
-                <!-- Conteúdo do patrocinador da barra esquerda será inserido aqui pelo JavaScript -->
-            </div>
+                </div>
         </div>
         <div class="l-bar-bottom" id="lBarBottom">
             <div class="sponsor-content" id="bottomSponsorContent">
-                <!-- Conteúdo do patrocinador da barra inferior será inserido aqui pelo JavaScript -->
-            </div>
+                </div>
         </div>
     </div>
 
@@ -168,18 +177,38 @@
             const leftSponsorContent = document.getElementById('leftSponsorContent');
             const bottomSponsorContent = document.getElementById('bottomSponsorContent');
 
-            // Renderiza apenas o texto para a barra lateral esquerda
-            if (sponsorOverlayState.leftSponsor && sponsorOverlayState.leftSponsor.text) {
-                leftSponsorContent.innerHTML = `<span class="sponsor-text">${sponsorOverlayState.leftSponsor.text}</span>`;
-            } else {
-                leftSponsorContent.innerHTML = ''; // Limpa o conteúdo se não houver texto
+            // Renderiza o conteúdo para a barra lateral esquerda (logo e/ou texto)
+            leftSponsorContent.innerHTML = ''; // Limpa o conteúdo anterior
+            if (sponsorOverlayState.leftSponsor) {
+                if (sponsorOverlayState.leftSponsor.logo) {
+                    const img = document.createElement('img');
+                    img.src = sponsorOverlayState.leftSponsor.logo;
+                    img.alt = 'Logo Patrocinador Esquerda';
+                    leftSponsorContent.appendChild(img);
+                }
+                if (sponsorOverlayState.leftSponsor.text) {
+                    const span = document.createElement('span');
+                    span.className = 'sponsor-text';
+                    span.textContent = sponsorOverlayState.leftSponsor.text;
+                    leftSponsorContent.appendChild(span);
+                }
             }
 
-            // Renderiza apenas o texto para a barra inferior
-            if (sponsorOverlayState.bottomSponsor && sponsorOverlayState.bottomSponsor.text) {
-                bottomSponsorContent.innerHTML = `<span class="sponsor-text">${sponsorOverlayState.bottomSponsor.text}</span>`;
-            } else {
-                bottomSponsorContent.innerHTML = ''; // Limpa o conteúdo se não houver texto
+            // Renderiza o conteúdo para a barra inferior (logo e/ou texto)
+            bottomSponsorContent.innerHTML = ''; // Limpa o conteúdo anterior
+            if (sponsorOverlayState.bottomSponsor) {
+                if (sponsorOverlayState.bottomSponsor.logo) {
+                    const img = document.createElement('img');
+                    img.src = sponsorOverlayState.bottomSponsor.logo;
+                    img.alt = 'Logo Patrocinador Inferior';
+                    bottomSponsorContent.appendChild(img);
+                }
+                if (sponsorOverlayState.bottomSponsor.text) {
+                    const span = document.createElement('span');
+                    span.className = 'sponsor-text';
+                    span.textContent = sponsorOverlayState.bottomSponsor.text;
+                    bottomSponsorContent.appendChild(span);
+                }
             }
         }
     </script>

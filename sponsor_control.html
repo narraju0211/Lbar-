@@ -22,8 +22,8 @@
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 550px; /* Aumentado para acomodar mais campos */
-            margin: 0 auto; /* Centraliza na tela */
+            max-width: 550px;
+            margin: 0 auto;
             box-sizing: border-box;
         }
 
@@ -53,8 +53,7 @@
             color: #666;
         }
 
-        input[type="text"],
-        input[type="number"],
+        input,
         textarea {
             width: calc(100% - 20px);
             padding: 10px;
@@ -69,42 +68,43 @@
             min-height: 80px;
         }
 
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input#leftBackgroundOpacity {
+            width: 100%;
+        }
+
         input[type="file"] {
-            width: 100%;
-            padding: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1em;
-            box-sizing: border-box;
-            background-color: #f9f9f9;
+            padding: 5px 0;
         }
 
-        input[type="range"] {
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .preview-logo, .preview-background {
+        .preview-logo, .preview-background, .preview-bottom-image {
             margin-top: 10px;
             text-align: center;
             border: 1px solid #eee;
             border-radius: 5px;
             padding: 5px;
             background-color: #fdfdfd;
-            height: 100px; /* Altura fixa para pré-visualização */
+            height: 80px; /* Altura menor para otimizar espaço */
             overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
         }
-        .preview-logo img, .preview-background img {
+        .preview-logo img, .preview-background img, .preview-bottom-image img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
-            display: none; /* Escondido por padrão */
+            display: none;
         }
-        .preview-logo img[src]:not([src=""]), .preview-background img[src]:not([src=""]) {
-            display: block; /* Mostra se tiver src */
+        .preview-logo img:not([src=""]),
+        .preview-background img:not([src=""]),
+        .preview-bottom-image img:not([src=""]) {
+            display: block;
         }
 
         button {
@@ -121,10 +121,10 @@
         }
 
         button.toggle-button {
-            background-color: #28a745; /* Verde para ligar */
+            background-color: #28a745;
         }
         button.toggle-button.active {
-            background-color: #dc3545; /* Vermelho para desligar */
+            background-color: #dc3545;
         }
         button.toggle-button:hover {
             opacity: 0.9;
@@ -177,6 +177,20 @@
             color: #333;
             font-size: 1.1em;
         }
+
+        .opacity-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .opacity-control span {
+            width: 30px;
+            text-align: right;
+            font-size: 0.9em;
+            color: #777;
+        }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -192,83 +206,72 @@
     </div>
 
     <div class="container sponsor-slots">
-        <div class="section-title">Configuração de Patrocinadores</div>
-
+        <div class="section-title">Configuração da Barra Lateral Esquerda</div>
         <div class="slot">
-            <div class="slot-header">
-                <h3>Barra Lateral Esquerda</h3>
-            </div>
             <div class="form-group">
-                <label for="leftSponsorLogo">Logo do Patrocinador:</label>
+                <label for="leftSponsorLogo">Logo da Empresa (o nome da empresa será exibido):</label>
                 <input type="file" id="leftSponsorLogo" accept="image/*">
                 <div class="preview-logo">
                     <img id="leftLogoPreview" src="" alt="Pré-visualização da Logo Esquerda">
                 </div>
-                <span class="note">Formato: PNG/JPG. Max: 1MB.</span>
+                <span class="note">Formatos: PNG, JPG. Tamanho máximo: 1MB. O *texto alternativo (alt)* da imagem será o nome da empresa exibido com destaque.</span>
             </div>
             <div class="form-group">
                 <label for="leftSegmentInfo">Informações do Segmento:</label>
-                <textarea id="leftSegmentInfo" placeholder="Ex: Construção Civil, Alimentos e Bebidas"></textarea>
+                <textarea id="leftSegmentInfo" placeholder="Ex: Tecnologia, Eventos, etc."></textarea>
             </div>
             <div class="form-group">
                 <label for="leftContactInfo">Contato e Atendimento:</label>
-                <textarea id="leftContactInfo" placeholder="Ex: (XX) XXXX-XXXX | Seg-Sex 9h-18h"></textarea>
+                <textarea id="leftContactInfo" placeholder="Ex: (XX) XXXX-XXXX, www.site.com.br, Seg-Sex 9h-18h"></textarea>
             </div>
             <div class="form-group">
-                <label for="leftBackgroundImage">Imagem de Fundo da Barra (Opcional):</label>
+                <label for="leftBackgroundImage">Imagem de Fundo (Para Ambas as Barras):</label>
                 <input type="file" id="leftBackgroundImage" accept="image/*">
                 <div class="preview-background">
                     <img id="leftBackgroundPreview" src="" alt="Pré-visualização do Fundo Esquerdo">
                 </div>
-                <span class="note">Preenche o restante da barra. Formato: PNG/JPG. Max: 1MB.</span>
+                <span class="note">Esta imagem preencherá o fundo da barra lateral E da barra inferior. Formatos: PNG, JPG. Tamanho máximo: 1MB.</span>
             </div>
-            <div class="form-group">
-                <label for="leftBackgroundOpacity">Transparência do Fundo:</label>
+            <div class="form-group opacity-control">
+                <label for="leftBackgroundOpacity">Transparência do Fundo (Para Ambas):</label>
                 <input type="range" id="leftBackgroundOpacity" min="0" max="1" step="0.05" value="1">
-                <span id="leftOpacityValue" class="note">1.00</span>
+                <span id="leftOpacityValue">1.00</span>
             </div>
-            <button class="set-sponsor-button" onclick="setSponsor('left')">Atualizar Patrocinador Esquerda</button>
+            <button class="set-sponsor-button" onclick="setSponsor('left')">Atualizar Barra Esquerda & Fundo</button>
         </div>
 
+        <div class="section-title">Configuração da Barra Inferior (3 Imagens)</div>
         <div class="slot">
-            <div class="slot-header">
-                <h3>Barra Inferior</h3>
-            </div>
             <div class="form-group">
-                <label for="bottomSponsorLogo">Logo do Patrocinador:</label>
-                <input type="file" id="bottomSponsorLogo" accept="image/*">
-                <div class="preview-logo">
-                    <img id="bottomLogoPreview" src="" alt="Pré-visualização da Logo Inferior">
+                <label for="bottomImage1">Imagem 1 (principal):</label>
+                <input type="file" id="bottomImage1" accept="image/*">
+                <div class="preview-bottom-image">
+                    <img id="bottomPreview1" src="" alt="Pré-visualização Imagem 1">
                 </div>
-                <span class="note">Formato: PNG/JPG. Max: 1MB.</span>
+                <span class="note">Formatos: PNG, JPG. Tamanho máximo por imagem: 1MB.</span>
             </div>
             <div class="form-group">
-                <label for="bottomSegmentInfo">Informações do Segmento:</label>
-                <textarea id="bottomSegmentInfo" placeholder="Ex: Varejo, E-commerce"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="bottomContactInfo">Contato e Atendimento:</label>
-                <textarea id="bottomContactInfo" placeholder="Ex: contato@empresa.com | (XX) YYYY-YYYY"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="bottomBackgroundImage">Imagem de Fundo da Barra (Opcional):</label>
-                <input type="file" id="bottomBackgroundImage" accept="image/*">
-                <div class="preview-background">
-                    <img id="bottomBackgroundPreview" src="" alt="Pré-visualização do Fundo Inferior">
+                <label for="bottomImage2">Imagem 2 (opcional):</label>
+                <input type="file" id="bottomImage2" accept="image/*">
+                <div class="preview-bottom-image">
+                    <img id="bottomPreview2" src="" alt="Pré-visualização Imagem 2">
                 </div>
-                <span class="note">Preenche o restante da barra. Formato: PNG/JPG. Max: 1MB.</span>
+                <span class="note">Formatos: PNG, JPG. Tamanho máximo por imagem: 1MB.</span>
             </div>
             <div class="form-group">
-                <label for="bottomBackgroundOpacity">Transparência do Fundo:</label>
-                <input type="range" id="bottomBackgroundOpacity" min="0" max="1" step="0.05" value="1">
-                <span id="bottomOpacityValue" class="note">1.00</span>
+                <label for="bottomImage3">Imagem 3 (opcional):</label>
+                <input type="file" id="bottomImage3" accept="image/*">
+                <div class="preview-bottom-image">
+                    <img id="bottomPreview3" src="" alt="Pré-visualização Imagem 3">
+                </div>
+                <span class="note">Formatos: PNG, JPG. Tamanho máximo por imagem: 1MB.</span>
             </div>
-            <button class="set-sponsor-button" onclick="setSponsor('bottom')">Atualizar Patrocinador Inferior</button>
+            <button class="set-sponsor-button" onclick="setSponsor('bottom')">Atualizar Barra Inferior</button>
         </div>
     </div>
 
     <script>
-        // ** SEU FIREBASE CONFIG ESTÁ AQUI (ATUALIZADO!) **
+        // ** SEU FIREBASE CONFIG ESTÁ AQUI **
         const firebaseConfig = {
           apiKey: "AIzaSyAFp_iujrtqjiTU5yq2yNSBIpwgjQZZyns",
           authDomain: "aquilesplacarpro.firebaseapp.com",
@@ -281,11 +284,10 @@
 
         // Inicializa o Firebase com suas configurações
         const app = firebase.initializeApp(firebaseConfig);
-        const database = app.database(); // Referência ao Realtime Database
-        // Refere-se ao nó 'sponsorOverlayState' no Realtime Database, onde os dados da overlay serão salvos
+        const database = app.database();
         const sponsorStateRef = database.ref('sponsorOverlayState');
 
-        // Referências aos elementos HTML
+        // Elementos HTML
         const toggleVisibilityBtn = document.getElementById('toggleVisibilityBtn');
         const visibilityStatus = document.getElementById('visibilityStatus');
 
@@ -300,26 +302,22 @@
         const leftOpacityValueSpan = document.getElementById('leftOpacityValue');
 
         // Bottom Bar Elements
-        const bottomSponsorLogoInput = document.getElementById('bottomSponsorLogo');
-        const bottomLogoPreview = document.getElementById('bottomLogoPreview');
-        const bottomSegmentInfoTextarea = document.getElementById('bottomSegmentInfo');
-        const bottomContactInfoTextarea = document.getElementById('bottomContactInfo');
-        const bottomBackgroundImageInput = document.getElementById('bottomBackgroundImage');
-        const bottomBackgroundPreview = document.getElementById('bottomBackgroundPreview');
-        const bottomBackgroundOpacitySlider = document.getElementById('bottomBackgroundOpacity');
-        const bottomOpacityValueSpan = document.getElementById('bottomOpacityValue');
+        const bottomImageInput1 = document.getElementById('bottomImage1');
+        const bottomPreview1 = document.getElementById('bottomPreview1');
+        const bottomImageInput2 = document.getElementById('bottomImage2');
+        const bottomPreview2 = document.getElementById('bottomPreview2');
+        const bottomImageInput3 = document.getElementById('bottomImage3');
+        const bottomPreview3 = document.getElementById('bottomPreview3');
 
-        // Tamanho máximo de arquivo permitido (1MB = 1024 * 1024 bytes)
         const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
 
-        // Helper para pré-visualizar e validar imagens
-        function setupImageInput(inputElement, previewElement, opacitySlider = null, opacitySpan = null) {
+        function setupImageInput(inputElement, previewElement) {
             inputElement.addEventListener('change', (event) => {
-                const file = event.target.files[0];
+                const file = event.target.files?.[0];
                 if (file) {
                     if (file.size > MAX_FILE_SIZE) {
-                        alert(`O arquivo selecionado (${(file.size / (1024 * 1024)).toFixed(2)} MB) é muito grande. O tamanho máximo permitido é ${MAX_FILE_SIZE / (1024 * 1024)} MB.`);
-                        inputElement.value = ''; // Limpa o input file
+                        alert(`O arquivo selecionado (${(file.size / (1024 * 1024)).toFixed(2)} MB) é muito grande. Máximo: 1MB.`);
+                        inputElement.value = '';
                         previewElement.src = '';
                         previewElement.style.display = 'none';
                         return;
@@ -335,90 +333,64 @@
                     previewElement.style.display = 'none';
                 }
             });
-
-            if (opacitySlider && opacitySpan) {
-                opacitySlider.addEventListener('input', () => {
-                    opacitySpan.textContent = parseFloat(opacitySlider.value).toFixed(2);
-                });
-            }
         }
 
         setupImageInput(leftSponsorLogoInput, leftLogoPreview);
-        setupImageInput(leftBackgroundImageInput, leftBackgroundPreview, leftBackgroundOpacitySlider, leftOpacityValueSpan);
-        setupImageInput(bottomSponsorLogoInput, bottomLogoPreview);
-        setupImageInput(bottomBackgroundImageInput, bottomBackgroundPreview, bottomBackgroundOpacitySlider, bottomOpacityValueSpan);
+        setupImageInput(leftBackgroundImageInput, leftBackgroundPreview);
+        setupImageInput(bottomImageInput1, bottomPreview1);
+        setupImageInput(bottomImageInput2, bottomPreview2);
+        setupImageInput(bottomImageInput3, bottomPreview3);
 
-        // Listener para mudanças nos dados da overlay no Firebase
+        function updateOpacityValue(sliderElement, valueSpan) {
+            sliderElement.addEventListener('input', () => {
+                valueSpan.textContent = parseFloat(sliderElement.value).toFixed(2);
+            });
+        }
+
+        updateOpacityValue(leftBackgroundOpacitySlider, leftOpacityValueSpan);
+
         sponsorStateRef.on('value', (snapshot) => {
             const state = snapshot.val();
             if (state && typeof state.isVisible !== 'undefined') {
                 updateToggleButton(state.isVisible);
                 updateVisibilityStatus(state.isVisible);
 
-                // Preenche os campos da Barra Esquerda
+                // Left Bar
                 if (state.leftSponsor) {
-                    leftSponsorLogoInput.value = ''; // Clear file input for security (cannot set value)
                     leftLogoPreview.src = state.leftSponsor.logo || '';
+                    leftLogoPreview.alt = state.leftSponsor.logoText || ''; // Atualiza o alt text do preview
                     leftLogoPreview.style.display = state.leftSponsor.logo ? 'block' : 'none';
                     leftSegmentInfoTextarea.value = state.leftSponsor.segmentInfo || '';
                     leftContactInfoTextarea.value = state.leftSponsor.contactInfo || '';
-                    leftBackgroundImageInput.value = ''; // Clear file input
                     leftBackgroundPreview.src = state.leftSponsor.backgroundImage || '';
                     leftBackgroundPreview.style.display = state.leftSponsor.backgroundImage ? 'block' : 'none';
-                    const opacityL = state.leftSponsor.backgroundOpacity !== undefined ? state.leftSponsor.backgroundOpacity : 1;
-                    leftBackgroundOpacitySlider.value = opacityL;
-                    leftOpacityValueSpan.textContent = parseFloat(opacityL).toFixed(2);
+                    leftBackgroundOpacitySlider.value = state.leftSponsor.backgroundOpacity !== undefined ? state.leftSponsor.backgroundOpacity : 1;
+                    leftOpacityValueSpan.textContent = parseFloat(leftBackgroundOpacitySlider.value).toFixed(2);
                 } else {
-                    // Reset all fields if no data
-                    leftSponsorLogoInput.value = '';
-                    leftLogoPreview.src = ''; leftLogoPreview.style.display = 'none';
+                    leftLogoPreview.src = ''; leftLogoPreview.alt = ''; leftLogoPreview.style.display = 'none';
                     leftSegmentInfoTextarea.value = '';
                     leftContactInfoTextarea.value = '';
-                    leftBackgroundImageInput.value = '';
                     leftBackgroundPreview.src = ''; leftBackgroundPreview.style.display = 'none';
-                    leftBackgroundOpacitySlider.value = 1;
-                    leftOpacityValueSpan.textContent = '1.00';
+                    leftBackgroundOpacitySlider.value = 1; leftOpacityValueSpan.textContent = '1.00';
                 }
 
-                // Preenche os campos da Barra Inferior
-                if (state.bottomSponsor) {
-                    bottomSponsorLogoInput.value = '';
-                    bottomLogoPreview.src = state.bottomSponsor.logo || '';
-                    bottomLogoPreview.style.display = state.bottomSponsor.logo ? 'block' : 'none';
-                    bottomSegmentInfoTextarea.value = state.bottomSponsor.segmentInfo || '';
-                    bottomContactInfoTextarea.value = state.bottomSponsor.contactInfo || '';
-                    bottomBackgroundImageInput.value = '';
-                    bottomBackgroundPreview.src = state.bottomSponsor.backgroundImage || '';
-                    bottomBackgroundPreview.style.display = state.bottomSponsor.backgroundImage ? 'block' : 'none';
-                    const opacityB = state.bottomSponsor.backgroundOpacity !== undefined ? state.bottomSponsor.backgroundOpacity : 1;
-                    bottomBackgroundOpacitySlider.value = opacityB;
-                    bottomOpacityValueSpan.textContent = parseFloat(opacityB).toFixed(2);
+                // Bottom Bar Images
+                if (state.bottomSponsorImages) {
+                    bottomPreview1.src = state.bottomSponsorImages[0] || '';
+                    bottomPreview1.style.display = state.bottomSponsorImages[0] ? 'block' : 'none';
+                    bottomPreview2.src = state.bottomSponsorImages[1] || '';
+                    bottomPreview2.style.display = state.bottomSponsorImages[1] ? 'block' : 'none';
+                    bottomPreview3.src = state.bottomSponsorImages[2] || '';
+                    bottomPreview3.style.display = state.bottomSponsorImages[2] ? 'block' : 'none';
                 } else {
-                    // Reset all fields if no data
-                    bottomSponsorLogoInput.value = '';
-                    bottomLogoPreview.src = ''; bottomLogoPreview.style.display = 'none';
-                    bottomSegmentInfoTextarea.value = '';
-                    bottomContactInfoTextarea.value = '';
-                    bottomBackgroundImageInput.value = '';
-                    bottomBackgroundPreview.src = ''; bottomBackgroundPreview.style.display = 'none';
-                    bottomBackgroundOpacitySlider.value = 1;
-                    bottomOpacityValueSpan.textContent = '1.00';
+                    bottomPreview1.src = ''; bottomPreview1.style.display = 'none';
+                    bottomPreview2.src = ''; bottomPreview2.style.display = 'none';
+                    bottomPreview3.src = ''; bottomPreview3.style.display = 'none';
                 }
 
             } else {
-                // Estado inicial se não houver dados no Firebase
                 updateToggleButton(false);
                 updateVisibilityStatus(false);
-                // Reset all fields
-                leftSponsorLogoInput.value = ''; leftLogoPreview.src = ''; leftLogoPreview.style.display = 'none';
-                leftSegmentInfoTextarea.value = ''; leftContactInfoTextarea.value = '';
-                leftBackgroundImageInput.value = ''; leftBackgroundPreview.src = ''; leftBackgroundPreview.style.display = 'none';
-                leftBackgroundOpacitySlider.value = 1; leftOpacityValueSpan.textContent = '1.00';
-
-                bottomSponsorLogoInput.value = ''; bottomLogoPreview.src = ''; bottomLogoPreview.style.display = 'none';
-                bottomSegmentInfoTextarea.value = ''; bottomContactInfoTextarea.value = '';
-                bottomBackgroundImageInput.value = ''; bottomBackgroundPreview.src = ''; bottomBackgroundPreview.style.display = 'none';
-                bottomBackgroundOpacitySlider.value = 1; bottomOpacityValueSpan.textContent = '1.00';
             }
         }, (error) => {
             console.error("Erro ao ler dados do Firebase:", error);
@@ -428,22 +400,13 @@
         });
 
         function updateToggleButton(isVisible) {
-            if (isVisible) {
-                toggleVisibilityBtn.textContent = 'Desligar Overlay';
-                toggleVisibilityBtn.classList.add('active');
-            } else {
-                toggleVisibilityBtn.textContent = 'Ligar Overlay';
-                toggleVisibilityBtn.classList.remove('active');
-            }
+            toggleVisibilityBtn.textContent = isVisible ? 'Desligar Overlay' : 'Ligar Overlay';
+            toggleVisibilityBtn.classList.toggle('active', isVisible);
             toggleVisibilityBtn.disabled = false;
         }
 
         function updateVisibilityStatus(isVisible) {
-            if (isVisible) {
-                visibilityStatus.innerHTML = '<span class="on">LIGADA</span>';
-            } else {
-                visibilityStatus.innerHTML = '<span class="off">DESLIGADA</span>';
-            }
+            visibilityStatus.innerHTML = `<span class="${isVisible ? 'on' : 'off'}">${isVisible ? 'LIGADA' : 'DESLIGADA'}</span>`;
         }
 
         toggleVisibilityBtn.addEventListener('click', () => {
@@ -453,7 +416,6 @@
                 .catch(error => console.error('Erro ao atualizar visibilidade:', error));
         });
 
-        // Função para converter arquivo de imagem para Base64
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -463,83 +425,81 @@
             });
         }
 
-        // Função assíncrona para definir (atualizar) os dados de um patrocinador no Firebase
         async function setSponsor(slot) {
-            let logoFile, segmentInfo, contactInfo, backgroundImageFile, backgroundOpacity;
-            let logoInput, bgImageInput;
-
             if (slot === 'left') {
-                logoInput = leftSponsorLogoInput;
-                logoFile = leftSponsorLogoInput.files[0];
-                segmentInfo = leftSegmentInfoTextarea.value;
-                contactInfo = leftContactInfoTextarea.value;
-                bgImageInput = leftBackgroundImageInput;
-                backgroundImageFile = leftBackgroundImageInput.files[0];
-                backgroundOpacity = parseFloat(leftBackgroundOpacitySlider.value);
-            } else { // slot === 'bottom'
-                logoInput = bottomSponsorLogoInput;
-                logoFile = bottomSponsorLogoInput.files[0];
-                segmentInfo = bottomSegmentInfoTextarea.value;
-                contactInfo = bottomContactInfoTextarea.value;
-                bgImageInput = bottomBackgroundImageInput;
-                backgroundImageFile = bottomBackgroundImageInput.files[0];
-                backgroundOpacity = parseFloat(bottomBackgroundOpacitySlider.value);
-            }
+                const logoFile = leftSponsorLogoInput.files?.[0];
+                const segmentInfo = leftSegmentInfoTextarea.value;
+                const contactInfo = leftContactInfoTextarea.value;
+                const backgroundImageFile = leftBackgroundImageInput.files?.[0];
+                const backgroundOpacity = parseFloat(leftBackgroundOpacitySlider.value);
 
-            // Validação do tamanho do arquivo da logo
-            if (logoFile && logoFile.size > MAX_FILE_SIZE) {
-                alert(`O arquivo da logo selecionado para o slot ${slot === 'left' ? 'Esquerda' : 'Inferior'} (${(logoFile.size / (1024 * 1024)).toFixed(2)} MB) é muito grande. O tamanho máximo permitido é ${MAX_FILE_SIZE / (1024 * 1024)} MB. Por favor, escolha uma imagem menor.`);
-                logoInput.value = ''; // Limpa o input file
-                return;
-            }
-
-            // Validação do tamanho do arquivo da imagem de fundo
-            if (backgroundImageFile && backgroundImageFile.size > MAX_FILE_SIZE) {
-                alert(`O arquivo de imagem de fundo selecionado para o slot ${slot === 'left' ? 'Esquerda' : 'Inferior'} (${(backgroundImageFile.size / (1024 * 1024)).toFixed(2)} MB) é muito grande. O tamanho máximo permitido é ${MAX_FILE_SIZE / (1024 * 1024)} MB. Por favor, escolha uma imagem menor.`);
-                bgImageInput.value = ''; // Limpa o input file
-                return;
-            }
-
-            let logoBase64 = '';
-            if (logoFile) {
-                try {
-                    logoBase64 = await fileToBase64(logoFile);
-                } catch (error) {
-                    console.error("Erro ao converter logo para Base64:", error);
-                    alert("Erro ao carregar a logo. Tente novamente.");
+                if (logoFile && logoFile.size > MAX_FILE_SIZE) {
+                    alert(`O arquivo da logo é muito grande (max 1MB).`);
+                    leftSponsorLogoInput.value = '';
                     return;
                 }
-            }
-
-            let backgroundImageBase64 = '';
-            if (backgroundImageFile) {
-                try {
-                    backgroundImageBase64 = await fileToBase64(backgroundImageFile);
-                } catch (error) {
-                    console.error("Erro ao converter imagem de fundo para Base64:", error);
-                    alert("Erro ao carregar a imagem de fundo. Tente novamente.");
+                if (backgroundImageFile && backgroundImageFile.size > MAX_FILE_SIZE) {
+                    alert(`O arquivo de fundo é muito grande (max 1MB).`);
+                    leftBackgroundImageInput.value = '';
                     return;
                 }
+
+                let logoBase64 = logoFile ? await fileToBase64(logoFile) : leftLogoPreview.src || '';
+                let logoText = logoFile ? logoFile.name.split('.')[0] : leftLogoPreview.alt || ''; // Usar nome do arquivo como texto, ou o alt existente
+                let backgroundImageBase64 = backgroundImageFile ? await fileToBase64(backgroundImageFile) : leftBackgroundPreview.src || '';
+
+                const updateData = {
+                    leftSponsor: {
+                        logo: logoBase64,
+                        logoText: logoText, // Salva o texto da logo no Firebase
+                        segmentInfo: segmentInfo,
+                        contactInfo: contactInfo,
+                        backgroundImage: backgroundImageBase64,
+                        backgroundOpacity: backgroundOpacity
+                    }
+                };
+                sponsorStateRef.update(updateData)
+                    .then(() => alert('Barra Esquerda & Fundo atualizados!'))
+                    .catch(error => console.error('Erro ao atualizar Barra Esquerda:', error));
+
+            } else if (slot === 'bottom') {
+                const imageFile1 = bottomImageInput1.files?.[0];
+                const imageFile2 = bottomImageInput2.files?.[0];
+                const imageFile3 = bottomImageInput3.files?.[0];
+                const bottomImages = [];
+
+                async function processFile(file, index) {
+                    if (file) {
+                        if (file.size > MAX_FILE_SIZE) {
+                            alert(`A Imagem ${index + 1} é muito grande (max 1MB).`);
+                            if (index === 0) bottomImageInput1.value = '';
+                            if (index === 1) bottomImageInput2.value = '';
+                            if (index === 2) bottomImageInput3.value = '';
+                            return null; // Indica que o arquivo é inválido
+                        }
+                        return await fileToBase64(file);
+                    }
+                    // Se não houver novo arquivo, tenta manter o existente do Firebase
+                    const stateSnapshot = await sponsorStateRef.get();
+                    const currentState = stateSnapshot.val();
+                    return currentState?.bottomSponsorImages?.[index] || '';
+                }
+
+                // Processa cada arquivo, esperando que as promessas sejam resolvidas
+                const img1 = await processFile(imageFile1, 0);
+                const img2 = await processFile(imageFile2, 1);
+                const img3 = await processFile(imageFile3, 2);
+
+                // Adiciona apenas as imagens válidas ao array
+                if (img1 !== null) bottomImages.push(img1);
+                if (img2 !== null) bottomImages.push(img2);
+                if (img3 !== null) bottomImages.push(img3);
+
+                sponsorStateRef.update({ bottomSponsorImages: bottomImages })
+                    .then(() => alert('Barra Inferior atualizada!'))
+                    .catch(error => console.error('Erro ao atualizar Barra Inferior:', error));
             }
-
-            const updateData = {};
-            updateData[`${slot}Sponsor`] = {
-                logo: logoBase64,
-                segmentInfo: segmentInfo,
-                contactInfo: contactInfo,
-                backgroundImage: backgroundImageBase64,
-                backgroundOpacity: backgroundOpacity
-            };
-
-            sponsorStateRef.update(updateData)
-                .then(() => {
-                    alert(`Patrocinador da ${slot === 'left' ? 'Barra Lateral Esquerda' : 'Barra Inferior'} atualizado com sucesso!`);
-                })
-                .catch(error => {
-                    console.error(`Erro ao atualizar patrocinador do slot ${slot}:`, error);
-                    alert(`Erro ao atualizar patrocinador do slot ${slot} no Firebase. Verifique o console.`);
-                });
         }
     </script>
 </body>
-                </html>
+</html>

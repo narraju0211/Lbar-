@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Patrocínio L-Bar</title>
     <style>
-        /* Estilos CSS para o layout e aparência do painel de controle */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 20px;
@@ -74,36 +73,44 @@
             margin: 0;
         }
 
-        input#leftBackgroundOpacity {
+        input#backgroundOpacity {
             width: 100%;
         }
 
-        input[type="file"] {
-            padding: 5px 0;
+        input::file-selector-button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
-        .preview-logo, .preview-background, .preview-bottom-image {
+        input::file-selector-button:hover {
+            background-color: #0056b3;
+        }
+
+        .preview-logo, .preview-background {
             margin-top: 10px;
             text-align: center;
             border: 1px solid #eee;
             border-radius: 5px;
             padding: 5px;
             background-color: #fdfdfd;
-            height: 80px; /* Altura menor para otimizar espaço */
+            height: 80px;
             overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
         }
-        .preview-logo img, .preview-background img, .preview-bottom-image img {
+        .preview-logo img, .preview-background img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
             display: none;
         }
-        .preview-logo img:not([src=""]),
-        .preview-background img:not([src=""]),
-        .preview-bottom-image img:not([src=""]) {
+        .preview-logo img:not([src=""]), .preview-background img:not([src=""]) {
             display: block;
         }
 
@@ -153,43 +160,11 @@
             margin-top: 5px;
         }
 
-        .sponsor-slots {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .slot {
+        .sponsor-config {
             border: 1px solid #eee;
             padding: 15px;
             border-radius: 5px;
             background-color: #fdfdfd;
-        }
-
-        .slot-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .slot-header h3 {
-            margin: 0;
-            color: #333;
-            font-size: 1.1em;
-        }
-
-        .opacity-control {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .opacity-control span {
-            width: 30px;
-            text-align: right;
-            font-size: 0.9em;
-            color: #777;
         }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -205,73 +180,48 @@
         <button id="toggleVisibilityBtn" class="toggle-button">Carregando...</button>
     </div>
 
-    <div class="container sponsor-slots">
-        <div class="section-title">Configuração da Barra Lateral Esquerda</div>
-        <div class="slot">
-            <div class="form-group">
-                <label for="leftSponsorLogo">Logo da Empresa (o nome da empresa será exibido):</label>
-                <input type="file" id="leftSponsorLogo" accept="image/*">
-                <div class="preview-logo">
-                    <img id="leftLogoPreview" src="" alt="Pré-visualização da Logo Esquerda">
-                </div>
-                <span class="note">Formatos: PNG, JPG. Tamanho máximo: 1MB. O *texto alternativo (alt)* da imagem será o nome da empresa exibido com destaque.</span>
+    <div class="container sponsor-config">
+        <div class="section-title">Configuração da Barra de Patrocínio</div>
+        <div class="form-group">
+            <label for="sponsorLogo">Logo da Empresa (opcional - Nome digitado abaixo será o principal):</label>
+            <input type="file" id="sponsorLogo" accept="image/*">
+            <div class="preview-logo">
+                <img id="logoPreview" src="" alt="Pré-visualização da Logo">
             </div>
-            <div class="form-group">
-                <label for="leftSegmentInfo">Informações do Segmento:</label>
-                <textarea id="leftSegmentInfo" placeholder="Ex: Tecnologia, Eventos, etc."></textarea>
-            </div>
-            <div class="form-group">
-                <label for="leftContactInfo">Contato e Atendimento:</label>
-                <textarea id="leftContactInfo" placeholder="Ex: (XX) XXXX-XXXX, www.site.com.br, Seg-Sex 9h-18h"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="leftBackgroundImage">Imagem de Fundo (Para Ambas as Barras):</label>
-                <input type="file" id="leftBackgroundImage" accept="image/*">
-                <div class="preview-background">
-                    <img id="leftBackgroundPreview" src="" alt="Pré-visualização do Fundo Esquerdo">
-                </div>
-                <span class="note">Esta imagem preencherá o fundo da barra lateral E da barra inferior. Formatos: PNG, JPG. Tamanho máximo: 1MB.</span>
-            </div>
-            <div class="form-group opacity-control">
-                <label for="leftBackgroundOpacity">Transparência do Fundo (Para Ambas):</label>
-                <input type="range" id="leftBackgroundOpacity" min="0" max="1" step="0.05" value="1">
-                <span id="leftOpacityValue">1.00</span>
-            </div>
-            <button class="set-sponsor-button" onclick="setSponsor('left')">Atualizar Barra Esquerda & Fundo</button>
+            <span class="note">Formatos: PNG, JPG. Tamanho máximo: 1MB. Se você digitar o "Nome da Empresa" abaixo, ele terá prioridade.</span>
         </div>
-
-        <div class="section-title">Configuração da Barra Inferior (3 Imagens)</div>
-        <div class="slot">
-            <div class="form-group">
-                <label for="bottomImage1">Imagem 1 (principal):</label>
-                <input type="file" id="bottomImage1" accept="image/*">
-                <div class="preview-bottom-image">
-                    <img id="bottomPreview1" src="" alt="Pré-visualização Imagem 1">
-                </div>
-                <span class="note">Formatos: PNG, JPG. Tamanho máximo por imagem: 1MB.</span>
-            </div>
-            <div class="form-group">
-                <label for="bottomImage2">Imagem 2 (opcional):</label>
-                <input type="file" id="bottomImage2" accept="image/*">
-                <div class="preview-bottom-image">
-                    <img id="bottomPreview2" src="" alt="Pré-visualização Imagem 2">
-                </div>
-                <span class="note">Formatos: PNG, JPG. Tamanho máximo por imagem: 1MB.</span>
-            </div>
-            <div class="form-group">
-                <label for="bottomImage3">Imagem 3 (opcional):</label>
-                <input type="file" id="bottomImage3" accept="image/*">
-                <div class="preview-bottom-image">
-                    <img id="bottomPreview3" src="" alt="Pré-visualização Imagem 3">
-                </div>
-                <span class="note">Formatos: PNG, JPG. Tamanho máximo por imagem: 1MB.</span>
-            </div>
-            <button class="set-sponsor-button" onclick="setSponsor('bottom')">Atualizar Barra Inferior</button>
+        <div class="form-group">
+            <label for="sponsorNameText">Nome da Empresa (texto principal e em grande destaque):</label>
+            <input type="text" id="sponsorNameText" placeholder="Nome da Empresa">
+            <span class="note">Este texto será exibido com MUITO destaque na barra.</span>
         </div>
+        <div class="form-group">
+            <label for="segmentInfo">Informações do Segmento (em destaque):</label>
+            <textarea id="segmentInfo" placeholder="Ex: Tecnologia, Eventos, etc."></textarea>
+        </div>
+        <div class="form-group">
+            <label for="contactInfo">Contato e Atendimento (em destaque):</label>
+            <textarea id="contactInfo" placeholder="Ex: (XX) XXXX-XXXX, www.site.com.br, Seg-Sex 9h-18h"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="backgroundImage">Imagem de Fundo da Barra (Unificada):</label>
+            <input type="file" id="backgroundImage" accept="image/*">
+            <div class="preview-background">
+                <img id="backgroundPreview" src="" alt="Pré-visualização do Fundo">
+            </div>
+            <span class="note">Esta imagem preencherá toda a barra. Formatos: PNG, JPG. Tamanho máximo: 1MB.</span>
+        </div>
+        <div class="form-group opacity-control">
+            <label for="backgroundOpacity">Transparência da IMAGEM de Fundo:</label>
+            <input type="range" id="backgroundOpacity" min="0" max="1" step="0.05" value="0.5">
+            <span id="opacityValue">0.50</span>
+            <span class="note">0 = totalmente transparente, 1 = totalmente opaca. Afeta apenas a imagem, o texto permanece visível.</span>
+        </div>
+        <button class="set-sponsor-button" onclick="setSponsor()">Atualizar Barra de Patrocínio</button>
     </div>
 
     <script>
-        // ** SEU FIREBASE CONFIG ESTÁ AQUI **
+        // ** SEU FIREBASE CONFIGURAÇÃO **
         const firebaseConfig = {
           apiKey: "AIzaSyAFp_iujrtqjiTU5yq2yNSBIpwgjQZZyns",
           authDomain: "aquilesplacarpro.firebaseapp.com",
@@ -282,32 +232,22 @@
           appId: "1:922321609151:web:ba51f5b21b322cf0a4c10a"
         };
 
-        // Inicializa o Firebase com suas configurações
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = app.database();
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
         const sponsorStateRef = database.ref('sponsorOverlayState');
 
-        // Elementos HTML
         const toggleVisibilityBtn = document.getElementById('toggleVisibilityBtn');
         const visibilityStatus = document.getElementById('visibilityStatus');
 
-        // Left Bar Elements
-        const leftSponsorLogoInput = document.getElementById('leftSponsorLogo');
-        const leftLogoPreview = document.getElementById('leftLogoPreview');
-        const leftSegmentInfoTextarea = document.getElementById('leftSegmentInfo');
-        const leftContactInfoTextarea = document.getElementById('leftContactInfo');
-        const leftBackgroundImageInput = document.getElementById('leftBackgroundImage');
-        const leftBackgroundPreview = document.getElementById('leftBackgroundPreview');
-        const leftBackgroundOpacitySlider = document.getElementById('leftBackgroundOpacity');
-        const leftOpacityValueSpan = document.getElementById('leftOpacityValue');
-
-        // Bottom Bar Elements
-        const bottomImageInput1 = document.getElementById('bottomImage1');
-        const bottomPreview1 = document.getElementById('bottomPreview1');
-        const bottomImageInput2 = document.getElementById('bottomImage2');
-        const bottomPreview2 = document.getElementById('bottomPreview2');
-        const bottomImageInput3 = document.getElementById('bottomImage3');
-        const bottomPreview3 = document.getElementById('bottomPreview3');
+        const sponsorLogoInput = document.getElementById('sponsorLogo');
+        const logoPreview = document.getElementById('logoPreview');
+        const sponsorNameTextInput = document.getElementById('sponsorNameText');
+        const segmentInfoTextarea = document.getElementById('segmentInfo');
+        const contactInfoTextarea = document.getElementById('contactInfo');
+        const backgroundImageInput = document.getElementById('backgroundImage');
+        const backgroundPreview = document.getElementById('backgroundPreview');
+        const backgroundOpacitySlider = document.getElementById('backgroundOpacity');
+        const opacityValueSpan = document.getElementById('opacityValue');
 
         const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
 
@@ -317,7 +257,7 @@
                 if (file) {
                     if (file.size > MAX_FILE_SIZE) {
                         alert(`O arquivo selecionado (${(file.size / (1024 * 1024)).toFixed(2)} MB) é muito grande. Máximo: 1MB.`);
-                        inputElement.value = '';
+                        inputElement.value = ''; // Limpa o campo de seleção de arquivo
                         previewElement.src = '';
                         previewElement.style.display = 'none';
                         return;
@@ -335,62 +275,59 @@
             });
         }
 
-        setupImageInput(leftSponsorLogoInput, leftLogoPreview);
-        setupImageInput(leftBackgroundImageInput, leftBackgroundPreview);
-        setupImageInput(bottomImageInput1, bottomPreview1);
-        setupImageInput(bottomImageInput2, bottomPreview2);
-        setupImageInput(bottomImageInput3, bottomPreview3);
+        setupImageInput(sponsorLogoInput, logoPreview);
+        setupImageInput(backgroundImageInput, backgroundPreview);
 
-        function updateOpacityValue(sliderElement, valueSpan) {
-            sliderElement.addEventListener('input', () => {
-                valueSpan.textContent = parseFloat(sliderElement.value).toFixed(2);
-            });
+        function updateOpacityValue() {
+            opacityValueSpan.textContent = parseFloat(backgroundOpacitySlider.value).toFixed(2);
         }
 
-        updateOpacityValue(leftBackgroundOpacitySlider, leftOpacityValueSpan);
+        backgroundOpacitySlider.addEventListener('input', updateOpacityValue);
 
+        // Listener para carregar o estado atual do Firebase no painel
         sponsorStateRef.on('value', (snapshot) => {
             const state = snapshot.val();
             if (state && typeof state.isVisible !== 'undefined') {
                 updateToggleButton(state.isVisible);
                 updateVisibilityStatus(state.isVisible);
 
-                // Left Bar
-                if (state.leftSponsor) {
-                    leftLogoPreview.src = state.leftSponsor.logo || '';
-                    leftLogoPreview.alt = state.leftSponsor.logoText || ''; // Atualiza o alt text do preview
-                    leftLogoPreview.style.display = state.leftSponsor.logo ? 'block' : 'none';
-                    leftSegmentInfoTextarea.value = state.leftSponsor.segmentInfo || '';
-                    leftContactInfoTextarea.value = state.leftSponsor.contactInfo || '';
-                    leftBackgroundPreview.src = state.leftSponsor.backgroundImage || '';
-                    leftBackgroundPreview.style.display = state.leftSponsor.backgroundImage ? 'block' : 'none';
-                    leftBackgroundOpacitySlider.value = state.leftSponsor.backgroundOpacity !== undefined ? state.leftSponsor.backgroundOpacity : 1;
-                    leftOpacityValueSpan.textContent = parseFloat(leftBackgroundOpacitySlider.value).toFixed(2);
+                if (state.sponsor) {
+                    // Atualiza previews e campos de texto
+                    logoPreview.src = state.sponsor.logo || '';
+                    logoPreview.style.display = state.sponsor.logo ? 'block' : 'none';
+                    sponsorNameTextInput.value = state.sponsor.nameText || '';
+                    segmentInfoTextarea.value = state.sponsor.segmentInfo || '';
+                    contactInfoTextarea.value = state.sponsor.contactInfo || '';
+                    // Não pré-preenche input type="file" por segurança e design
+                    // backgroundImageInput.value = ''; // Manter limpo ou você pode comentar isso
+                    backgroundPreview.src = state.sponsor.backgroundImage || '';
+                    backgroundPreview.style.display = state.sponsor.backgroundImage ? 'block' : 'none';
+                    backgroundOpacitySlider.value = state.sponsor.backgroundOpacity !== undefined ? state.sponsor.backgroundOpacity : 0.5;
+                    updateOpacityValue();
                 } else {
-                    leftLogoPreview.src = ''; leftLogoPreview.alt = ''; leftLogoPreview.style.display = 'none';
-                    leftSegmentInfoTextarea.value = '';
-                    leftContactInfoTextarea.value = '';
-                    leftBackgroundPreview.src = ''; leftBackgroundPreview.style.display = 'none';
-                    leftBackgroundOpacitySlider.value = 1; leftOpacityValueSpan.textContent = '1.00';
-                }
-
-                // Bottom Bar Images
-                if (state.bottomSponsorImages) {
-                    bottomPreview1.src = state.bottomSponsorImages[0] || '';
-                    bottomPreview1.style.display = state.bottomSponsorImages[0] ? 'block' : 'none';
-                    bottomPreview2.src = state.bottomSponsorImages[1] || '';
-                    bottomPreview2.style.display = state.bottomSponsorImages[1] ? 'block' : 'none';
-                    bottomPreview3.src = state.bottomSponsorImages[2] || '';
-                    bottomPreview3.style.display = state.bottomSponsorImages[2] ? 'block' : 'none';
-                } else {
-                    bottomPreview1.src = ''; bottomPreview1.style.display = 'none';
-                    bottomPreview2.src = ''; bottomPreview2.style.display = 'none';
-                    bottomPreview3.src = ''; bottomPreview3.style.display = 'none';
+                    // Limpa todos os campos se não houver dados de patrocinador
+                    logoPreview.src = ''; logoPreview.style.display = 'none';
+                    sponsorNameTextInput.value = '';
+                    segmentInfoTextarea.value = '';
+                    contactInfoTextarea.value = '';
+                    backgroundImageInput.value = '';
+                    backgroundPreview.src = ''; backgroundPreview.style.display = 'none';
+                    backgroundOpacitySlider.value = 0.5;
+                    updateOpacityValue();
                 }
 
             } else {
                 updateToggleButton(false);
                 updateVisibilityStatus(false);
+                // Se não há estado, reseta tudo
+                logoPreview.src = ''; logoPreview.style.display = 'none';
+                sponsorNameTextInput.value = '';
+                segmentInfoTextarea.value = '';
+                contactInfoTextarea.value = '';
+                backgroundImageInput.value = '';
+                backgroundPreview.src = ''; backgroundPreview.style.display = 'none';
+                backgroundOpacitySlider.value = 0.5;
+                updateOpacityValue();
             }
         }, (error) => {
             console.error("Erro ao ler dados do Firebase:", error);
@@ -425,80 +362,46 @@
             });
         }
 
-        async function setSponsor(slot) {
-            if (slot === 'left') {
-                const logoFile = leftSponsorLogoInput.files?.[0];
-                const segmentInfo = leftSegmentInfoTextarea.value;
-                const contactInfo = leftContactInfoTextarea.value;
-                const backgroundImageFile = leftBackgroundImageInput.files?.[0];
-                const backgroundOpacity = parseFloat(leftBackgroundOpacitySlider.value);
+        async function setSponsor() {
+            const logoFile = sponsorLogoInput.files?.[0];
+            const sponsorNameText = sponsorNameTextInput.value;
+            const segmentInfo = segmentInfoTextarea.value;
+            const contactInfo = contactInfoTextarea.value;
+            const backgroundImageFile = backgroundImageInput.files?.[0];
+            const backgroundOpacity = parseFloat(backgroundOpacitySlider.value);
 
-                if (logoFile && logoFile.size > MAX_FILE_SIZE) {
-                    alert(`O arquivo da logo é muito grande (max 1MB).`);
-                    leftSponsorLogoInput.value = '';
-                    return;
-                }
-                if (backgroundImageFile && backgroundImageFile.size > MAX_FILE_SIZE) {
-                    alert(`O arquivo de fundo é muito grande (max 1MB).`);
-                    leftBackgroundImageInput.value = '';
-                    return;
-                }
-
-                let logoBase64 = logoFile ? await fileToBase64(logoFile) : leftLogoPreview.src || '';
-                let logoText = logoFile ? logoFile.name.split('.')[0] : leftLogoPreview.alt || ''; // Usar nome do arquivo como texto, ou o alt existente
-                let backgroundImageBase64 = backgroundImageFile ? await fileToBase64(backgroundImageFile) : leftBackgroundPreview.src || '';
-
-                const updateData = {
-                    leftSponsor: {
-                        logo: logoBase64,
-                        logoText: logoText, // Salva o texto da logo no Firebase
-                        segmentInfo: segmentInfo,
-                        contactInfo: contactInfo,
-                        backgroundImage: backgroundImageBase64,
-                        backgroundOpacity: backgroundOpacity
-                    }
-                };
-                sponsorStateRef.update(updateData)
-                    .then(() => alert('Barra Esquerda & Fundo atualizados!'))
-                    .catch(error => console.error('Erro ao atualizar Barra Esquerda:', error));
-
-            } else if (slot === 'bottom') {
-                const imageFile1 = bottomImageInput1.files?.[0];
-                const imageFile2 = bottomImageInput2.files?.[0];
-                const imageFile3 = bottomImageInput3.files?.[0];
-                const bottomImages = [];
-
-                async function processFile(file, index) {
-                    if (file) {
-                        if (file.size > MAX_FILE_SIZE) {
-                            alert(`A Imagem ${index + 1} é muito grande (max 1MB).`);
-                            if (index === 0) bottomImageInput1.value = '';
-                            if (index === 1) bottomImageInput2.value = '';
-                            if (index === 2) bottomImageInput3.value = '';
-                            return null; // Indica que o arquivo é inválido
-                        }
-                        return await fileToBase64(file);
-                    }
-                    // Se não houver novo arquivo, tenta manter o existente do Firebase
-                    const stateSnapshot = await sponsorStateRef.get();
-                    const currentState = stateSnapshot.val();
-                    return currentState?.bottomSponsorImages?.[index] || '';
-                }
-
-                // Processa cada arquivo, esperando que as promessas sejam resolvidas
-                const img1 = await processFile(imageFile1, 0);
-                const img2 = await processFile(imageFile2, 1);
-                const img3 = await processFile(imageFile3, 2);
-
-                // Adiciona apenas as imagens válidas ao array
-                if (img1 !== null) bottomImages.push(img1);
-                if (img2 !== null) bottomImages.push(img2);
-                if (img3 !== null) bottomImages.push(img3);
-
-                sponsorStateRef.update({ bottomSponsorImages: bottomImages })
-                    .then(() => alert('Barra Inferior atualizada!'))
-                    .catch(error => console.error('Erro ao atualizar Barra Inferior:', error));
+            if (logoFile && logoFile.size > MAX_FILE_SIZE) {
+                alert(`O arquivo da logo é muito grande (max 1MB).`);
+                sponsorLogoInput.value = '';
+                return;
             }
+            if (backgroundImageFile && backgroundImageFile.size > MAX_FILE_SIZE) {
+                alert(`O arquivo de fundo é muito grande (max 1MB).`);
+                backgroundImageInput.value = '';
+                return;
+            }
+
+            // Pega o estado atual para manter imagens se não forem alteradas
+            const currentStateSnapshot = await sponsorStateRef.get();
+            const currentSponsorData = currentStateSnapshot.val()?.sponsor || {};
+
+            // Decide se usa a nova imagem ou a imagem já existente no Firebase
+            const logoBase64 = logoFile ? await fileToBase64(logoFile) : currentSponsorData.logo || '';
+            const backgroundImageBase64 = backgroundImageFile ? await fileToBase64(backgroundImageFile) : currentSponsorData.backgroundImage || '';
+
+            const updateData = {
+                sponsor: {
+                    logo: logoBase64,
+                    nameText: sponsorNameText, // Campo de texto para o nome principal
+                    segmentInfo: segmentInfo,
+                    contactInfo: contactInfo,
+                    backgroundImage: backgroundImageBase64,
+                    backgroundOpacity: backgroundOpacity
+                }
+            };
+            sponsorStateRef.update(updateData)
+                .then(() => alert('Barra de Patrocínio atualizada!'))
+                .catch(error => console.error('Erro ao atualizar barra de patrocínio:', error));
         }
     </script>
 </body>

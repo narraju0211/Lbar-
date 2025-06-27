@@ -10,8 +10,7 @@
             --l-bar-bg-color: rgba(0, 0, 0, 0.7); /* Fundo preto semi-transparente */
             --l-bar-border-color: #00f; /* Borda azul neon (exemplo) */
             --text-color: #fff; /* Cor do texto padrão */
-            --sponsor-logo-max-height: 80px; /* Altura máxima para logos individuais */
-            --sponsor-logo-max-width: 90%; /* Largura máxima para logos individuais */
+            /* Váriaveis de logo removidas */
             --animation-duration: 0.5s; /* Duração das animações de fade in/out */
         }
 
@@ -78,32 +77,27 @@
             padding: 5px 15px; /* Padding interno */
         }
 
-        /* Estilos para o conteúdo dos patrocinadores (logo e texto) */
+        /* Estilos para o conteúdo dos patrocinadores (apenas texto) */
         .sponsor-content {
             display: flex;
-            flex-direction: column; /* Para empilhar logos e texto */
+            flex-direction: column; /* Para empilhar texto */
             justify-content: center;
             align-items: center;
             width: 100%;
             height: 100%; /* Ocupa todo o espaço disponível na barra */
-            gap: 10px; /* Espaço entre a logo e o texto */
+            gap: 10px; /* Espaço entre elementos, se houver */
             text-align: center;
             font-size: 1.2em;
             text-shadow: 0 0 5px rgba(0,0,0,0.8); /* Sombra para o texto */
         }
 
-        .sponsor-content img {
-            max-height: var(--sponsor-logo-max-height); /* Limita a altura da logo */
-            max-width: var(--sponsor-logo-max-width); /* Limita a largura da logo */
-            object-fit: contain; /* Garante que a logo caiba sem distorcer */
-            filter: drop-shadow(0 0 3px rgba(255,255,255,0.4)); /* Sombra suave para a logo */
-        }
+        /* img removido */
 
         .sponsor-text {
-            font-size: 0.9em; /* Tamanho da fonte para o texto do patrocinador */
+            font-size: 1.1em; /* Tamanho da fonte para o texto do patrocinador */
             word-break: break-word; /* Permite quebrar palavras longas para caber no espaço */
             padding: 0 5px;
-            max-height: 40%; /* Limita a altura do texto para não dominar a logo */
+            max-height: 100%; /* Ocupa toda a altura disponível */
             overflow: hidden; /* Esconde texto que vaze */
         }
 
@@ -149,52 +143,41 @@
             bottomSponsor: { logo: '', text: '' } // Dados do patrocinador inferior
         };
 
-        // Quando o DOM (estrutura da página) estiver completamente carregado
         document.addEventListener('DOMContentLoaded', () => {
-            // Adiciona um listener para mudanças no nó 'sponsorOverlayState' do Firebase
             sponsorStateRef.on('value', (snapshot) => {
-                if (snapshot.exists()) { // Verifica se há dados no snapshot
-                    sponsorOverlayState = snapshot.val(); // Atualiza o estado local com os dados do Firebase
-                    renderOverlay(); // Chama a função para renderizar a overlay com os novos dados
+                if (snapshot.exists()) {
+                    sponsorOverlayState = snapshot.val();
+                    renderOverlay();
                 }
             }, (error) => {
-                // Em caso de erro na leitura do Firebase
                 console.error("Erro ao ler dados do Firebase:", error);
             });
         });
 
-        // Função para renderizar (desenhar) a overlay na tela com base no estado atual
         function renderOverlay() {
             const lBarContainer = document.getElementById('lBarContainer');
 
-            // Controla a visibilidade da overlay (fade in/out)
             if (sponsorOverlayState.isVisible) {
-                lBarContainer.classList.add('active'); // Adiciona a classe para mostrar a overlay
+                lBarContainer.classList.add('active');
             } else {
-                lBarContainer.classList.remove('active'); // Remove a classe para esconder a overlay
+                lBarContainer.classList.remove('active');
             }
 
             const leftSponsorContent = document.getElementById('leftSponsorContent');
             const bottomSponsorContent = document.getElementById('bottomSponsorContent');
 
-            // Renderiza o conteúdo do patrocinador da barra lateral esquerda
-            if (sponsorOverlayState.leftSponsor && sponsorOverlayState.leftSponsor.logo) {
-                leftSponsorContent.innerHTML = `
-                    <img src="${sponsorOverlayState.leftSponsor.logo}" alt="Logo Patrocinador Esquerda">
-                    ${sponsorOverlayState.leftSponsor.text ? `<span class="sponsor-text">${sponsorOverlayState.leftSponsor.text}</span>` : ''}
-                `;
+            // Renderiza apenas o texto para a barra lateral esquerda
+            if (sponsorOverlayState.leftSponsor && sponsorOverlayState.leftSponsor.text) {
+                leftSponsorContent.innerHTML = `<span class="sponsor-text">${sponsorOverlayState.leftSponsor.text}</span>`;
             } else {
-                leftSponsorContent.innerHTML = ''; // Limpa o conteúdo se não houver logo
+                leftSponsorContent.innerHTML = ''; // Limpa o conteúdo se não houver texto
             }
 
-            // Renderiza o conteúdo do patrocinador da barra inferior
-            if (sponsorOverlayState.bottomSponsor && sponsorOverlayState.bottomSponsor.logo) {
-                bottomSponsorContent.innerHTML = `
-                    <img src="${sponsorOverlayState.bottomSponsor.logo}" alt="Logo Patrocinador Inferior">
-                    ${sponsorOverlayState.bottomSponsor.text ? `<span class="sponsor-text">${sponsorOverlayState.bottomSponsor.text}</span>` : ''}
-                `;
+            // Renderiza apenas o texto para a barra inferior
+            if (sponsorOverlayState.bottomSponsor && sponsorOverlayState.bottomSponsor.text) {
+                bottomSponsorContent.innerHTML = `<span class="sponsor-text">${sponsorOverlayState.bottomSponsor.text}</span>`;
             } else {
-                bottomSponsorContent.innerHTML = ''; // Limpa o conteúdo se não houver logo
+                bottomSponsorContent.innerHTML = ''; // Limpa o conteúdo se não houver texto
             }
         }
     </script>

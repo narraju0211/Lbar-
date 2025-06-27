@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Overlay de Patrocínio L-Bar</title>
     <style>
-        /* Variáveis CSS para fácil customização */
+        /* Variáveis CSS para fácil customização de cores, tamanhos e duração de animação */
         :root {
             --l-bar-bg-color: rgba(0, 0, 0, 0.7); /* Fundo preto semi-transparente */
             --l-bar-border-color: #00f; /* Borda azul neon (exemplo) */
             --text-color: #fff; /* Cor do texto padrão */
             --sponsor-logo-max-height: 80px; /* Altura máxima para logos individuais */
             --sponsor-logo-max-width: 90%; /* Largura máxima para logos individuais */
-            --animation-duration: 0.5s; /* Duração das animações */
+            --animation-duration: 0.5s; /* Duração das animações de fade in/out */
         }
 
         body {
@@ -21,47 +21,47 @@
             overflow: hidden; /* Garante que não haja barras de rolagem */
             background-color: transparent; /* O MAIS IMPORTANTE: fundo transparente para o OBS/Prism */
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            height: 100vh; /* Ocupa a altura total da tela */
-            width: 100vw; /* Ocupa a largura total da tela */
-            display: flex; /* Para controlar o layout dos elementos */
+            height: 100vh; /* Ocupa a altura total da tela visível */
+            width: 100vw; /* Ocupa a largura total da tela visível */
+            display: flex; /* Para controlar o layout dos elementos principais */
             justify-content: flex-start; /* Alinha os itens ao início (esquerda) */
             align-items: flex-end; /* Alinha os itens ao final (inferior) */
         }
 
         .l-bar-container {
-            position: absolute;
+            position: absolute; /* Posicionamento absoluto dentro do body */
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none; /* Permite clicar através da overlay quando inativa */
+            pointer-events: none; /* Permite clicar através da overlay (importante para interagir com o que está por baixo no OBS) */
             opacity: 0; /* Começa invisível */
-            transition: opacity var(--animation-duration) ease-in-out;
+            transition: opacity var(--animation-duration) ease-in-out; /* Transição suave para visibilidade */
             display: flex; /* Para organizar as barras lateral e inferior */
             justify-content: flex-start;
             align-items: flex-end;
         }
 
         .l-bar-container.active {
-            opacity: 1; /* Torna visível quando ativo */
-            pointer-events: all; /* Permite interação quando ativo (se houver) */
+            opacity: 1; /* Torna visível quando a classe 'active' é adicionada */
+            pointer-events: all; /* Pode interagir quando ativo (se houver elementos clicáveis) */
         }
 
         .l-bar-left, .l-bar-bottom {
-            background-color: var(--l-bar-bg-color);
-            border: 1px solid var(--l-bar-border-color);
-            box-sizing: border-box; /* Inclui padding e borda na largura/altura */
+            background-color: var(--l-bar-bg-color); /* Cor de fundo da barra */
+            border: 1px solid var(--l-bar-border-color); /* Borda da barra */
+            box-sizing: border-box; /* Inclui padding e borda na largura/altura total */
             display: flex;
             justify-content: center;
             align-items: center;
-            color: var(--text-color);
-            overflow: hidden; /* Esconde conteúdo que vaze */
+            color: var(--text-color); /* Cor do texto */
+            overflow: hidden; /* Esconde conteúdo que vaze da barra */
             box-shadow: 0 0 15px rgba(0, 255, 255, 0.5); /* Sombra neon */
         }
 
         .l-bar-left {
-            width: 200px; /* Largura da barra lateral - AJUSTAR FUTURAMENTE */
-            height: calc(100% - 100px); /* Altura: 100% menos a altura da barra inferior - AJUSTAR */
+            width: 200px; /* Largura da barra lateral (AJUSTAR SE NECESSÁRIO) */
+            height: calc(100% - 100px); /* Altura: 100% da tela menos a altura da barra inferior (AJUSTAR SE NECESSÁRIO) */
             position: absolute; /* Posição absoluta para o canto superior esquerdo */
             top: 0;
             left: 0;
@@ -70,7 +70,7 @@
         }
 
         .l-bar-bottom {
-            height: 100px; /* Altura da barra inferior - AJUSTAR FUTURAMENTE */
+            height: 100px; /* Altura da barra inferior (AJUSTAR SE NECESSÁRIO) */
             width: 100%; /* Largura total */
             position: absolute; /* Posição absoluta para a base */
             bottom: 0;
@@ -78,32 +78,32 @@
             padding: 5px 15px; /* Padding interno */
         }
 
-        /* Conteúdo dos patrocinadores */
+        /* Estilos para o conteúdo dos patrocinadores (logo e texto) */
         .sponsor-content {
             display: flex;
             flex-direction: column; /* Para empilhar logos e texto */
             justify-content: center;
             align-items: center;
             width: 100%;
-            height: 100%; /* Ocupa todo o espaço da barra */
-            gap: 10px; /* Espaço entre os elementos */
+            height: 100%; /* Ocupa todo o espaço disponível na barra */
+            gap: 10px; /* Espaço entre a logo e o texto */
             text-align: center;
             font-size: 1.2em;
-            text-shadow: 0 0 5px rgba(0,0,0,0.8);
+            text-shadow: 0 0 5px rgba(0,0,0,0.8); /* Sombra para o texto */
         }
 
         .sponsor-content img {
-            max-height: var(--sponsor-logo-max-height);
-            max-width: var(--sponsor-logo-max-width);
+            max-height: var(--sponsor-logo-max-height); /* Limita a altura da logo */
+            max-width: var(--sponsor-logo-max-width); /* Limita a largura da logo */
             object-fit: contain; /* Garante que a logo caiba sem distorcer */
             filter: drop-shadow(0 0 3px rgba(255,255,255,0.4)); /* Sombra suave para a logo */
         }
 
         .sponsor-text {
-            font-size: 0.9em;
-            word-break: break-word; /* Quebra palavras longas */
+            font-size: 0.9em; /* Tamanho da fonte para o texto do patrocinador */
+            word-break: break-word; /* Permite quebrar palavras longas para caber no espaço */
             padding: 0 5px;
-            max-height: 40%; /* Limita a altura do texto */
+            max-height: 40%; /* Limita a altura do texto para não dominar a logo */
             overflow: hidden; /* Esconde texto que vaze */
         }
 
@@ -125,67 +125,76 @@
 
     <script>
         // ** SEU FIREBASE CONFIG ESTÁ AQUI **
+        // Certifique-se de que estas são as suas credenciais EXATAS do projeto Firebase
         const firebaseConfig = {
-          apiKey: "AIzaSyC-***************************",
-          authDomain: "***************.firebaseapp.com",
-          databaseURL: "https://***************-default-rtdb.firebaseio.com",
-          projectId: "***************",
-          storageBucket: "***************.appspot.com",
-          messagingSenderId: "************",
-          appId: "1:************:web:**********************"
+          apiKey: "AIzaSyC-***************************", // Sua API Key
+          authDomain: "***************.firebaseapp.com", // Seu Auth Domain
+          databaseURL: "https://***************-default-rtdb.firebaseio.com", // Sua Database URL
+          projectId: "***************", // Seu Project ID
+          storageBucket: "***************.appspot.com", // Seu Storage Bucket (mesmo que não usado, manter por completude)
+          messagingSenderId: "************", // Seu Messaging Sender ID
+          appId: "1:************:web:**********************" // Seu App ID
         };
 
-        // Inicialize o Firebase
+        // Inicializa o Firebase com suas configurações
         const app = firebase.initializeApp(firebaseConfig);
-        const database = app.database();
-        const sponsorStateRef = database.ref('sponsorOverlayState'); // Novo nó no Firebase
+        const database = app.database(); // Referência ao Realtime Database
+        // Refere-se ao nó 'sponsorOverlayState' no Realtime Database, onde os dados da overlay estão salvos
+        const sponsorStateRef = database.ref('sponsorOverlayState');
 
+        // Objeto para armazenar o estado atual da overlay e dos patrocinadores
         let sponsorOverlayState = {
-            isVisible: false,
-            leftSponsor: { logo: '', text: '' },
-            bottomSponsor: { logo: '', text: '' }
+            isVisible: false, // Controla se a overlay está visível
+            leftSponsor: { logo: '', text: '' }, // Dados do patrocinador esquerdo
+            bottomSponsor: { logo: '', text: '' } // Dados do patrocinador inferior
         };
 
+        // Quando o DOM (estrutura da página) estiver completamente carregado
         document.addEventListener('DOMContentLoaded', () => {
+            // Adiciona um listener para mudanças no nó 'sponsorOverlayState' do Firebase
             sponsorStateRef.on('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    sponsorOverlayState = snapshot.val();
-                    renderOverlay();
+                if (snapshot.exists()) { // Verifica se há dados no snapshot
+                    sponsorOverlayState = snapshot.val(); // Atualiza o estado local com os dados do Firebase
+                    renderOverlay(); // Chama a função para renderizar a overlay com os novos dados
                 }
             }, (error) => {
+                // Em caso de erro na leitura do Firebase
                 console.error("Erro ao ler dados do Firebase:", error);
             });
         });
 
+        // Função para renderizar (desenhar) a overlay na tela com base no estado atual
         function renderOverlay() {
             const lBarContainer = document.getElementById('lBarContainer');
+
+            // Controla a visibilidade da overlay (fade in/out)
             if (sponsorOverlayState.isVisible) {
-                lBarContainer.classList.add('active');
+                lBarContainer.classList.add('active'); // Adiciona a classe para mostrar a overlay
             } else {
-                lBarContainer.classList.remove('active');
+                lBarContainer.classList.remove('active'); // Remove a classe para esconder a overlay
             }
 
             const leftSponsorContent = document.getElementById('leftSponsorContent');
             const bottomSponsorContent = document.getElementById('bottomSponsorContent');
 
-            // Renderiza o patrocinador da esquerda
+            // Renderiza o conteúdo do patrocinador da barra lateral esquerda
             if (sponsorOverlayState.leftSponsor && sponsorOverlayState.leftSponsor.logo) {
                 leftSponsorContent.innerHTML = `
                     <img src="${sponsorOverlayState.leftSponsor.logo}" alt="Logo Patrocinador Esquerda">
                     ${sponsorOverlayState.leftSponsor.text ? `<span class="sponsor-text">${sponsorOverlayState.leftSponsor.text}</span>` : ''}
                 `;
             } else {
-                leftSponsorContent.innerHTML = '';
+                leftSponsorContent.innerHTML = ''; // Limpa o conteúdo se não houver logo
             }
 
-            // Renderiza o patrocinador de baixo
+            // Renderiza o conteúdo do patrocinador da barra inferior
             if (sponsorOverlayState.bottomSponsor && sponsorOverlayState.bottomSponsor.logo) {
                 bottomSponsorContent.innerHTML = `
                     <img src="${sponsorOverlayState.bottomSponsor.logo}" alt="Logo Patrocinador Inferior">
                     ${sponsorOverlayState.bottomSponsor.text ? `<span class="sponsor-text">${sponsorOverlayState.bottomSponsor.text}</span>` : ''}
                 `;
             } else {
-                bottomSponsorContent.innerHTML = '';
+                bottomSponsorContent.innerHTML = ''; // Limpa o conteúdo se não houver logo
             }
         }
     </script>

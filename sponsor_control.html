@@ -22,7 +22,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 500px;
+            max-width: 550px; /* Aumentado para acomodar mais campos */
             margin: 0 auto; /* Centraliza na tela */
             box-sizing: border-box;
         }
@@ -79,17 +79,32 @@
             background-color: #f9f9f9;
         }
 
-        .preview-logo {
+        input[type="range"] {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .preview-logo, .preview-background {
             margin-top: 10px;
             text-align: center;
-        }
-        .preview-logo img {
-            max-width: 150px;
-            max-height: 150px;
             border: 1px solid #eee;
             border-radius: 5px;
             padding: 5px;
-            background-color: #fff;
+            background-color: #fdfdfd;
+            height: 100px; /* Altura fixa para pré-visualização */
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .preview-logo img, .preview-background img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none; /* Escondido por padrão */
+        }
+        .preview-logo img[src]:not([src=""]), .preview-background img[src]:not([src=""]) {
+            display: block; /* Mostra se tiver src */
         }
 
         button {
@@ -177,7 +192,7 @@
     </div>
 
     <div class="container sponsor-slots">
-        <div class="section-title">Patrocinadores</div>
+        <div class="section-title">Configuração de Patrocinadores</div>
 
         <div class="slot">
             <div class="slot-header">
@@ -187,13 +202,30 @@
                 <label for="leftSponsorLogo">Logo do Patrocinador:</label>
                 <input type="file" id="leftSponsorLogo" accept="image/*">
                 <div class="preview-logo">
-                    <img id="leftLogoPreview" src="" alt="Pré-visualização da Logo Esquerda" style="display: none;">
+                    <img id="leftLogoPreview" src="" alt="Pré-visualização da Logo Esquerda">
                 </div>
-                <span class="note">Formatos recomendados: PNG, JPG. Tamanho máximo: 500KB.</span>
+                <span class="note">Formato: PNG/JPG. Max: 1MB.</span>
             </div>
             <div class="form-group">
-                <label for="leftSponsorText">Texto do Patrocinador:</label>
-                <textarea id="leftSponsorText" placeholder="Ex: Patrocínio Master"></textarea>
+                <label for="leftSegmentInfo">Informações do Segmento:</label>
+                <textarea id="leftSegmentInfo" placeholder="Ex: Construção Civil, Alimentos e Bebidas"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="leftContactInfo">Contato e Atendimento:</label>
+                <textarea id="leftContactInfo" placeholder="Ex: (XX) XXXX-XXXX | Seg-Sex 9h-18h"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="leftBackgroundImage">Imagem de Fundo da Barra (Opcional):</label>
+                <input type="file" id="leftBackgroundImage" accept="image/*">
+                <div class="preview-background">
+                    <img id="leftBackgroundPreview" src="" alt="Pré-visualização do Fundo Esquerdo">
+                </div>
+                <span class="note">Preenche o restante da barra. Formato: PNG/JPG. Max: 1MB.</span>
+            </div>
+            <div class="form-group">
+                <label for="leftBackgroundOpacity">Transparência do Fundo:</label>
+                <input type="range" id="leftBackgroundOpacity" min="0" max="1" step="0.05" value="1">
+                <span id="leftOpacityValue" class="note">1.00</span>
             </div>
             <button class="set-sponsor-button" onclick="setSponsor('left')">Atualizar Patrocinador Esquerda</button>
         </div>
@@ -206,13 +238,30 @@
                 <label for="bottomSponsorLogo">Logo do Patrocinador:</label>
                 <input type="file" id="bottomSponsorLogo" accept="image/*">
                 <div class="preview-logo">
-                    <img id="bottomLogoPreview" src="" alt="Pré-visualização da Logo Inferior" style="display: none;">
+                    <img id="bottomLogoPreview" src="" alt="Pré-visualização da Logo Inferior">
                 </div>
-                <span class="note">Formatos recomendados: PNG, JPG. Tamanho máximo: 500KB.</span>
+                <span class="note">Formato: PNG/JPG. Max: 1MB.</span>
             </div>
             <div class="form-group">
-                <label for="bottomSponsorText">Texto do Patrocinador:</label>
-                <textarea id="bottomSponsorText" placeholder="Ex: Apoio: Sua Marca"></textarea>
+                <label for="bottomSegmentInfo">Informações do Segmento:</label>
+                <textarea id="bottomSegmentInfo" placeholder="Ex: Varejo, E-commerce"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="bottomContactInfo">Contato e Atendimento:</label>
+                <textarea id="bottomContactInfo" placeholder="Ex: contato@empresa.com | (XX) YYYY-YYYY"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="bottomBackgroundImage">Imagem de Fundo da Barra (Opcional):</label>
+                <input type="file" id="bottomBackgroundImage" accept="image/*">
+                <div class="preview-background">
+                    <img id="bottomBackgroundPreview" src="" alt="Pré-visualização do Fundo Inferior">
+                </div>
+                <span class="note">Preenche o restante da barra. Formato: PNG/JPG. Max: 1MB.</span>
+            </div>
+            <div class="form-group">
+                <label for="bottomBackgroundOpacity">Transparência do Fundo:</label>
+                <input type="range" id="bottomBackgroundOpacity" min="0" max="1" step="0.05" value="1">
+                <span id="bottomOpacityValue" class="note">1.00</span>
             </div>
             <button class="set-sponsor-button" onclick="setSponsor('bottom')">Atualizar Patrocinador Inferior</button>
         </div>
@@ -240,44 +289,64 @@
         const toggleVisibilityBtn = document.getElementById('toggleVisibilityBtn');
         const visibilityStatus = document.getElementById('visibilityStatus');
 
+        // Left Bar Elements
         const leftSponsorLogoInput = document.getElementById('leftSponsorLogo');
         const leftLogoPreview = document.getElementById('leftLogoPreview');
-        const leftSponsorTextarea = document.getElementById('leftSponsorText');
+        const leftSegmentInfoTextarea = document.getElementById('leftSegmentInfo');
+        const leftContactInfoTextarea = document.getElementById('leftContactInfo');
+        const leftBackgroundImageInput = document.getElementById('leftBackgroundImage');
+        const leftBackgroundPreview = document.getElementById('leftBackgroundPreview');
+        const leftBackgroundOpacitySlider = document.getElementById('leftBackgroundOpacity');
+        const leftOpacityValueSpan = document.getElementById('leftOpacityValue');
 
+        // Bottom Bar Elements
         const bottomSponsorLogoInput = document.getElementById('bottomSponsorLogo');
         const bottomLogoPreview = document.getElementById('bottomLogoPreview');
-        const bottomSponsorTextarea = document.getElementById('bottomSponsorText');
+        const bottomSegmentInfoTextarea = document.getElementById('bottomSegmentInfo');
+        const bottomContactInfoTextarea = document.getElementById('bottomContactInfo');
+        const bottomBackgroundImageInput = document.getElementById('bottomBackgroundImage');
+        const bottomBackgroundPreview = document.getElementById('bottomBackgroundPreview');
+        const bottomBackgroundOpacitySlider = document.getElementById('bottomBackgroundOpacity');
+        const bottomOpacityValueSpan = document.getElementById('bottomOpacityValue');
 
-        // Event Listeners para pré-visualização das logos
-        leftSponsorLogoInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    leftLogoPreview.src = e.target.result;
-                    leftLogoPreview.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            } else {
-                leftLogoPreview.src = '';
-                leftLogoPreview.style.display = 'none';
-            }
-        });
+        // Tamanho máximo de arquivo permitido (1MB = 1024 * 1024 bytes)
+        const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
 
-        bottomSponsorLogoInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    bottomLogoPreview.src = e.target.result;
-                    bottomLogoPreview.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            } else {
-                bottomLogoPreview.src = '';
-                bottomLogoPreview.style.display = 'none';
+        // Helper para pré-visualizar e validar imagens
+        function setupImageInput(inputElement, previewElement, opacitySlider = null, opacitySpan = null) {
+            inputElement.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    if (file.size > MAX_FILE_SIZE) {
+                        alert(`O arquivo selecionado (${(file.size / (1024 * 1024)).toFixed(2)} MB) é muito grande. O tamanho máximo permitido é ${MAX_FILE_SIZE / (1024 * 1024)} MB.`);
+                        inputElement.value = ''; // Limpa o input file
+                        previewElement.src = '';
+                        previewElement.style.display = 'none';
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        previewElement.src = e.target.result;
+                        previewElement.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    previewElement.src = '';
+                    previewElement.style.display = 'none';
+                }
+            });
+
+            if (opacitySlider && opacitySpan) {
+                opacitySlider.addEventListener('input', () => {
+                    opacitySpan.textContent = parseFloat(opacitySlider.value).toFixed(2);
+                });
             }
-        });
+        }
+
+        setupImageInput(leftSponsorLogoInput, leftLogoPreview);
+        setupImageInput(leftBackgroundImageInput, leftBackgroundPreview, leftBackgroundOpacitySlider, leftOpacityValueSpan);
+        setupImageInput(bottomSponsorLogoInput, bottomLogoPreview);
+        setupImageInput(bottomBackgroundImageInput, bottomBackgroundPreview, bottomBackgroundOpacitySlider, bottomOpacityValueSpan);
 
         // Listener para mudanças nos dados da overlay no Firebase
         sponsorStateRef.on('value', (snapshot) => {
@@ -286,47 +355,70 @@
                 updateToggleButton(state.isVisible);
                 updateVisibilityStatus(state.isVisible);
 
-                // Preenche os campos de texto e pré-visualiza as logos com os dados atuais do Firebase
+                // Preenche os campos da Barra Esquerda
                 if (state.leftSponsor) {
-                    leftSponsorTextarea.value = state.leftSponsor.text || '';
-                    if (state.leftSponsor.logo) {
-                        leftLogoPreview.src = state.leftSponsor.logo;
-                        leftLogoPreview.style.display = 'block';
-                    } else {
-                        leftLogoPreview.src = '';
-                        leftLogoPreview.style.display = 'none';
-                    }
+                    leftSponsorLogoInput.value = ''; // Clear file input for security (cannot set value)
+                    leftLogoPreview.src = state.leftSponsor.logo || '';
+                    leftLogoPreview.style.display = state.leftSponsor.logo ? 'block' : 'none';
+                    leftSegmentInfoTextarea.value = state.leftSponsor.segmentInfo || '';
+                    leftContactInfoTextarea.value = state.leftSponsor.contactInfo || '';
+                    leftBackgroundImageInput.value = ''; // Clear file input
+                    leftBackgroundPreview.src = state.leftSponsor.backgroundImage || '';
+                    leftBackgroundPreview.style.display = state.leftSponsor.backgroundImage ? 'block' : 'none';
+                    const opacityL = state.leftSponsor.backgroundOpacity !== undefined ? state.leftSponsor.backgroundOpacity : 1;
+                    leftBackgroundOpacitySlider.value = opacityL;
+                    leftOpacityValueSpan.textContent = parseFloat(opacityL).toFixed(2);
                 } else {
-                    leftSponsorTextarea.value = '';
-                    leftLogoPreview.src = '';
-                    leftLogoPreview.style.display = 'none';
+                    // Reset all fields if no data
+                    leftSponsorLogoInput.value = '';
+                    leftLogoPreview.src = ''; leftLogoPreview.style.display = 'none';
+                    leftSegmentInfoTextarea.value = '';
+                    leftContactInfoTextarea.value = '';
+                    leftBackgroundImageInput.value = '';
+                    leftBackgroundPreview.src = ''; leftBackgroundPreview.style.display = 'none';
+                    leftBackgroundOpacitySlider.value = 1;
+                    leftOpacityValueSpan.textContent = '1.00';
                 }
 
+                // Preenche os campos da Barra Inferior
                 if (state.bottomSponsor) {
-                    bottomSponsorTextarea.value = state.bottomSponsor.text || '';
-                    if (state.bottomSponsor.logo) {
-                        bottomLogoPreview.src = state.bottomSponsor.logo;
-                        bottomLogoPreview.style.display = 'block';
-                    } else {
-                        bottomLogoPreview.src = '';
-                        bottomLogoPreview.style.display = 'none';
-                    }
+                    bottomSponsorLogoInput.value = '';
+                    bottomLogoPreview.src = state.bottomSponsor.logo || '';
+                    bottomLogoPreview.style.display = state.bottomSponsor.logo ? 'block' : 'none';
+                    bottomSegmentInfoTextarea.value = state.bottomSponsor.segmentInfo || '';
+                    bottomContactInfoTextarea.value = state.bottomSponsor.contactInfo || '';
+                    bottomBackgroundImageInput.value = '';
+                    bottomBackgroundPreview.src = state.bottomSponsor.backgroundImage || '';
+                    bottomBackgroundPreview.style.display = state.bottomSponsor.backgroundImage ? 'block' : 'none';
+                    const opacityB = state.bottomSponsor.backgroundOpacity !== undefined ? state.bottomSponsor.backgroundOpacity : 1;
+                    bottomBackgroundOpacitySlider.value = opacityB;
+                    bottomOpacityValueSpan.textContent = parseFloat(opacityB).toFixed(2);
                 } else {
-                    bottomSponsorTextarea.value = '';
-                    bottomLogoPreview.src = '';
-                    bottomLogoPreview.style.display = 'none';
+                    // Reset all fields if no data
+                    bottomSponsorLogoInput.value = '';
+                    bottomLogoPreview.src = ''; bottomLogoPreview.style.display = 'none';
+                    bottomSegmentInfoTextarea.value = '';
+                    bottomContactInfoTextarea.value = '';
+                    bottomBackgroundImageInput.value = '';
+                    bottomBackgroundPreview.src = ''; bottomBackgroundPreview.style.display = 'none';
+                    bottomBackgroundOpacitySlider.value = 1;
+                    bottomOpacityValueSpan.textContent = '1.00';
                 }
 
             } else {
                 // Estado inicial se não houver dados no Firebase
                 updateToggleButton(false);
                 updateVisibilityStatus(false);
-                leftSponsorTextarea.value = '';
-                leftLogoPreview.src = '';
-                leftLogoPreview.style.display = 'none';
-                bottomSponsorTextarea.value = '';
-                bottomLogoPreview.src = '';
-                bottomLogoPreview.style.display = 'none';
+                // Reset all fields
+                leftSponsorLogoInput.value = ''; leftLogoPreview.src = ''; leftLogoPreview.style.display = 'none';
+                leftSegmentInfoTextarea.value = ''; leftContactInfoTextarea.value = '';
+                leftBackgroundImageInput.value = ''; leftBackgroundPreview.src = ''; leftBackgroundPreview.style.display = 'none';
+                leftBackgroundOpacitySlider.value = 1; leftOpacityValueSpan.textContent = '1.00';
+
+                bottomSponsorLogoInput.value = ''; bottomLogoPreview.src = ''; bottomLogoPreview.style.display = 'none';
+                bottomSegmentInfoTextarea.value = ''; bottomContactInfoTextarea.value = '';
+                bottomBackgroundImageInput.value = ''; bottomBackgroundPreview.src = ''; bottomBackgroundPreview.style.display = 'none';
+                bottomBackgroundOpacitySlider.value = 1; bottomOpacityValueSpan.textContent = '1.00';
             }
         }, (error) => {
             console.error("Erro ao ler dados do Firebase:", error);
@@ -373,14 +465,39 @@
 
         // Função assíncrona para definir (atualizar) os dados de um patrocinador no Firebase
         async function setSponsor(slot) {
-            let logoFile, textValue;
+            let logoFile, segmentInfo, contactInfo, backgroundImageFile, backgroundOpacity;
+            let logoInput, bgImageInput;
 
             if (slot === 'left') {
+                logoInput = leftSponsorLogoInput;
                 logoFile = leftSponsorLogoInput.files[0];
-                textValue = leftSponsorTextarea.value;
+                segmentInfo = leftSegmentInfoTextarea.value;
+                contactInfo = leftContactInfoTextarea.value;
+                bgImageInput = leftBackgroundImageInput;
+                backgroundImageFile = leftBackgroundImageInput.files[0];
+                backgroundOpacity = parseFloat(leftBackgroundOpacitySlider.value);
             } else { // slot === 'bottom'
+                logoInput = bottomSponsorLogoInput;
                 logoFile = bottomSponsorLogoInput.files[0];
-                textValue = bottomSponsorTextarea.value;
+                segmentInfo = bottomSegmentInfoTextarea.value;
+                contactInfo = bottomContactInfoTextarea.value;
+                bgImageInput = bottomBackgroundImageInput;
+                backgroundImageFile = bottomBackgroundImageInput.files[0];
+                backgroundOpacity = parseFloat(bottomBackgroundOpacitySlider.value);
+            }
+
+            // Validação do tamanho do arquivo da logo
+            if (logoFile && logoFile.size > MAX_FILE_SIZE) {
+                alert(`O arquivo da logo selecionado para o slot ${slot === 'left' ? 'Esquerda' : 'Inferior'} (${(logoFile.size / (1024 * 1024)).toFixed(2)} MB) é muito grande. O tamanho máximo permitido é ${MAX_FILE_SIZE / (1024 * 1024)} MB. Por favor, escolha uma imagem menor.`);
+                logoInput.value = ''; // Limpa o input file
+                return;
+            }
+
+            // Validação do tamanho do arquivo da imagem de fundo
+            if (backgroundImageFile && backgroundImageFile.size > MAX_FILE_SIZE) {
+                alert(`O arquivo de imagem de fundo selecionado para o slot ${slot === 'left' ? 'Esquerda' : 'Inferior'} (${(backgroundImageFile.size / (1024 * 1024)).toFixed(2)} MB) é muito grande. O tamanho máximo permitido é ${MAX_FILE_SIZE / (1024 * 1024)} MB. Por favor, escolha uma imagem menor.`);
+                bgImageInput.value = ''; // Limpa o input file
+                return;
             }
 
             let logoBase64 = '';
@@ -388,16 +505,30 @@
                 try {
                     logoBase64 = await fileToBase64(logoFile);
                 } catch (error) {
-                    console.error("Erro ao converter imagem para Base64:", error);
-                    alert("Erro ao carregar a imagem. Tente novamente.");
+                    console.error("Erro ao converter logo para Base64:", error);
+                    alert("Erro ao carregar a logo. Tente novamente.");
+                    return;
+                }
+            }
+
+            let backgroundImageBase64 = '';
+            if (backgroundImageFile) {
+                try {
+                    backgroundImageBase64 = await fileToBase64(backgroundImageFile);
+                } catch (error) {
+                    console.error("Erro ao converter imagem de fundo para Base64:", error);
+                    alert("Erro ao carregar a imagem de fundo. Tente novamente.");
                     return;
                 }
             }
 
             const updateData = {};
             updateData[`${slot}Sponsor`] = {
-                logo: logoBase64, // Salva a imagem em Base64
-                text: textValue
+                logo: logoBase64,
+                segmentInfo: segmentInfo,
+                contactInfo: contactInfo,
+                backgroundImage: backgroundImageBase64,
+                backgroundOpacity: backgroundOpacity
             };
 
             sponsorStateRef.update(updateData)

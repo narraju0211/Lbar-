@@ -3,108 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Overlay de Patrocínio</title>
+    <title>Sponsor L-Bar Overlay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Variáveis CSS para customização */
-        :root {
-            --bar-base-bg-color: rgba(0, 0, 0, 0.7);
-            --bar-border-color: #00f;
-            --text-color: #fff;
-            --logo-font-size: 3.5em; /* Fonte BEM MAIS GRANDE para o logo/nome */
-            --info-font-size: 2.2em; /* Fonte MAIS GRANDE para as outras infos */
-            --font-family-display: 'Impact', 'Arial Black', sans-serif; /* Fonte ainda mais chamativa */
-            --shadow-strong: 5px 5px 10px rgba(0, 0, 0, 0.9); /* Sombra ainda mais forte */
-        }
-
         body {
             margin: 0;
             padding: 0;
             overflow: hidden;
-            background-color: transparent;
-            font-family: var(--font-family-display);
-            height: 100vh;
-            width: 100vw;
-            display: flex;
-            justify-content: center; /* Centralizar horizontalmente */
-            align-items: center; /* Centralizar verticalmente */
+            background-color: transparent; /* Permite ver o fundo da transmissão */
+            font-family: 'Roboto', sans-serif;
         }
 
-        .sponsor-bar-container {
+        /* Container principal da overlay que controla a visibilidade e a posição */
+        #sponsor-overlay-container {
+            position: absolute;
+            bottom: 0; /* Fixa no rodapé */
+            left: 0;
+            width: 100%;
+            height: 120px; /* Altura da barra */
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Espaço entre os itens (logo, texto, contato) */
+            padding: 0 20px;
+            box-sizing: border-box;
+            background-color: rgba(0, 0, 0, 0.8); /* Fundo padrão preto com transparência */
+            color: white;
+            font-size: 1.2em;
+            overflow: hidden;
+            opacity: 0; /* Começa invisível */
+            transition: opacity 0.5s ease-in-out; /* Transição suave de visibilidade */
+            z-index: 1000; /* Garante que fique acima de outros elementos */
+
+            /* Estilo para a borda superior (como uma L-Bar estaria em jogo) */
+            border-top: 5px solid #ff4500; /* Laranja avermelhado */
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5); /* Sombra para dar profundidade */
+        }
+
+        #sponsor-overlay-container.active {
+            opacity: 1; /* Torna visível */
+        }
+
+        /* Área da Logo */
+        .sponsor-logo-area {
+            height: 80%; /* Altura máxima da logo dentro da barra */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px; /* Espaço após a logo */
+        }
+
+        .sponsor-logo-area img {
+            max-height: 100%;
+            max-width: auto; /* Garante que a imagem não distorça */
+            object-fit: contain;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5)); /* Efeito de brilho na logo */
+        }
+        
+        /* Área Principal de Texto (Nome da Empresa) */
+        .sponsor-main-text {
+            flex-grow: 1; /* Ocupa o máximo de espaço possível */
+            text-align: left;
+            font-family: 'Oswald', sans-serif;
+            font-size: 3.5em; /* Tamanho grande para o nome */
+            font-weight: 700;
+            text-transform: uppercase;
+            white-space: nowrap; /* Impede quebras de linha */
+            overflow: hidden;
+            text-overflow: ellipsis; /* Adiciona "..." se o texto for muito longo */
+            color: #ffd700; /* Dourado para o nome principal */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Sombra para o texto */
+        }
+
+        /* Área de Informações Secundárias (segmento e contato) */
+        .sponsor-info-area {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end; /* Alinha o texto à direita */
+            margin-left: 30px; /* Espaço antes das infos */
+            font-family: 'Roboto', sans-serif;
+            font-weight: 400;
+            font-size: 0.9em;
+            line-height: 1.3;
+            text-align: right;
+            color: #f0f0f0; /* Cor mais clara para as infos */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .sponsor-info-area div {
+            padding: 2px 0;
+        }
+
+        /* Imagem de Fundo Dinâmica */
+        #dynamic-background {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-            z-index: 100;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end; /* Barra na parte inferior */
-        }
-
-        .sponsor-bar-container.active {
-            opacity: 1;
-        }
-
-        .sponsor-bar {
-            position: relative; /* Para posicionar os textos dentro */
-            /* Largura: 100vw - 2 * (1px borda + 20px padding) */
-            width: calc(100vw - 42px); /* Ajustado para borda e padding */
-            height: 280px; /* Altura ainda maior para textos gigantes */
-            bottom: 0; /* Alinha na parte inferior */
-            left: 0; /* Alinha à esquerda */
-
-            background-color: var(--bar-base-bg-color);
-            border: 2px solid var(--bar-border-color); /* Borda mais grossa */
-            box-sizing: border-box;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.7); /* Sombra neon mais intensa */
-            background-repeat: no-repeat;
-            background-size: cover;
-            background-position: center;
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column; /* Organiza os itens em coluna */
-            justify-content: center; /* Centraliza os itens verticalmente */
-            align-items: center; /* Centraliza os itens horizontalmente */
-            padding: 20px;
-            text-align: center;
-            gap: 15px; /* Espaçamento entre os blocos de texto */
-        }
-
-        .sponsor-bar > div {
-            text-shadow: var(--shadow-strong);
-            word-break: break-word;
-            line-height: 1.1; /* Ajusta o espaçamento entre as linhas do texto */
-        }
-
-        .sponsor-logo {
-            font-size: var(--logo-font-size);
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .sponsor-segment {
-            font-size: var(--info-font-size);
-            font-style: italic;
-        }
-
-        .sponsor-contact {
-            font-size: var(--info-font-size);
-            font-weight: bold;
+            object-fit: cover; /* Cobre a barra inteira */
+            z-index: -1; /* Fica atrás do conteúdo */
+            opacity: 0.5; /* Transparência padrão para a imagem de fundo */
         }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
-    <div class="sponsor-bar-container" id="sponsorBarContainer">
-        <div class="sponsor-bar" id="sponsorBar">
-            <div id="sponsorLogoText" class="sponsor-logo"></div>
-            <div id="segmentInfoText" class="sponsor-segment"></div>
-            <div id="contactInfoText" class="sponsor-contact"></div>
+    <div id="sponsor-overlay-container">
+        <img id="dynamic-background" src="" alt="Fundo da L-Bar">
+
+        <div class="sponsor-logo-area">
+            <img id="sponsor-logo" src="" alt="Logo Patrocinador">
+        </div>
+
+        <div class="sponsor-main-text" id="sponsor-name-text">
+            NOME DO PATROCINADOR
+        </div>
+
+        <div class="sponsor-info-area">
+            <div id="segment-info"></div>
+            <div id="contact-info"></div>
         </div>
     </div>
 
@@ -123,13 +141,14 @@
 
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        const sponsorStateRef = database.ref('sponsorOverlayState');
+        const sponsorStateRef = database.ref('sponsorOverlayState'); // Nó onde os dados da L-Bar são salvos
 
-        const sponsorBarContainer = document.getElementById('sponsorBarContainer');
-        const sponsorBar = document.getElementById('sponsorBar');
-        const sponsorLogoTextDiv = document.getElementById('sponsorLogoText');
-        const segmentInfoTextDiv = document.getElementById('segmentInfoText');
-        const contactInfoTextDiv = document.getElementById('contactInfoText');
+        const overlayContainer = document.getElementById('sponsor-overlay-container');
+        const sponsorLogo = document.getElementById('sponsor-logo');
+        const sponsorNameTextDiv = document.getElementById('sponsor-name-text');
+        const segmentInfoDiv = document.getElementById('segment-info');
+        const contactInfoDiv = document.getElementById('contact-info');
+        const dynamicBackground = document.getElementById('dynamic-background');
 
         document.addEventListener('DOMContentLoaded', () => {
             sponsorStateRef.on('value', (snapshot) => {
@@ -137,40 +156,65 @@
                 if (state) {
                     renderOverlay(state);
                 } else {
+                    // Estado inicial se não houver dados no Firebase
                     renderOverlay({ isVisible: false, sponsor: {} });
                 }
+            }, (error) => {
+                console.error("Erro ao ler dados do Firebase na overlay:", error);
             });
         });
 
         function renderOverlay(state) {
-            sponsorBarContainer.classList.toggle('active', state.isVisible);
+            // Controla a visibilidade geral da overlay
+            overlayContainer.classList.toggle('active', state.isVisible);
 
-            const sponsorData = state.sponsor || {};
+            // Se a overlay está ativa e temos dados de patrocinador
+            if (state.isVisible && state.sponsor) {
+                const sponsorData = state.sponsor;
 
-            // A imagem de fundo e sua opacidade
-            const backgroundImage = sponsorData.backgroundImage;
-            const backgroundOpacity = sponsorData.backgroundOpacity !== undefined ? sponsorData.backgroundOpacity : 0.5;
+                // Define o Nome Principal (prioriza se o campo tiver texto)
+                if (sponsorData.nameText) {
+                    sponsorNameTextDiv.textContent = sponsorData.nameText;
+                    sponsorNameTextDiv.style.display = 'block'; // Mostra o texto
+                    sponsorLogo.style.display = 'none'; // Esconde a logo se o texto principal for usado
+                } else {
+                    sponsorNameTextDiv.textContent = ''; // Limpa o texto
+                    sponsorNameTextDiv.style.display = 'none'; // Esconde o campo de texto
+                    // Se não tem texto principal, tenta mostrar a logo
+                    if (sponsorData.logo) {
+                        sponsorLogo.src = sponsorData.logo;
+                        sponsorLogo.style.display = 'block';
+                    } else {
+                        sponsorLogo.src = '';
+                        sponsorLogo.style.display = 'none';
+                    }
+                }
 
-            // Definir o background da barra
-            if (backgroundImage) {
-                sponsorBar.style.backgroundImage = `url('${backgroundImage}')`;
-                // Ajusta a cor de fundo com base na opacidade do background, se houver imagem
-                // Isso cria o efeito de transparência na imagem sem afetar o texto
-                sponsorBar.style.backgroundColor = `rgba(0, 0, 0, ${1 - backgroundOpacity})`; // Ex: opacidade 0.5 na imagem = 0.5 de preto no fundo
-                sponsorBar.style.backgroundBlendMode = 'overlay'; // Mistura a imagem com a cor de fundo
+                // Informações do Segmento e Contato
+                segmentInfoDiv.textContent = sponsorData.segmentInfo || '';
+                contactInfoDiv.textContent = sponsorData.contactInfo || '';
+
+                // Imagem de Fundo e Transparência
+                if (sponsorData.backgroundImage) {
+                    dynamicBackground.src = sponsorData.backgroundImage;
+                    dynamicBackground.style.display = 'block';
+                    dynamicBackground.style.opacity = sponsorData.backgroundOpacity !== undefined ? parseFloat(sponsorData.backgroundOpacity) : 0.5;
+                } else {
+                    dynamicBackground.src = '';
+                    dynamicBackground.style.display = 'none';
+                }
+
             } else {
-                sponsorBar.style.backgroundImage = 'none';
-                sponsorBar.style.backgroundColor = `rgba(0, 0, 0, 0.7)`; // Cor padrão se não houver imagem
-                sponsorBar.style.backgroundBlendMode = 'normal';
+                // Se a overlay não está visível, limpa e esconde tudo
+                sponsorLogo.src = '';
+                sponsorLogo.style.display = 'none';
+                sponsorNameTextDiv.textContent = '';
+                sponsorNameTextDiv.style.display = 'none';
+                segmentInfoDiv.textContent = '';
+                contactInfoDiv.textContent = '';
+                dynamicBackground.src = '';
+                dynamicBackground.style.display = 'none';
             }
-            
-            // Certifica que a opacidade do elemento pai não afete o conteúdo
-            sponsorBar.style.opacity = 1; 
-
-            // Conteúdo textual
-            sponsorLogoTextDiv.textContent = sponsorData.nameText || '';
-            segmentInfoTextDiv.textContent = sponsorData.segmentInfo || '';
-            contactInfoTextDiv.textContent = sponsorData.contactInfo || '';
         }
     </script>
 </body>

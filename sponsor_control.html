@@ -153,7 +153,7 @@
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script> </head>
+    </head>
 <body>
     <div class="container">
         <h1>Controle de Patrocínio L-Bar</h1>
@@ -175,7 +175,7 @@
                 <label for="leftSponsorLogo">Logo (arquivo de imagem):</label>
                 <input type="file" id="leftSponsorLogo" accept="image/*">
                 <img id="leftLogoPreview" class="preview-logo" src="" alt="Prévia da Logo Esquerda" style="display: none;">
-                <span class="note">Será redimensionada para caber no espaço.</span>
+                <span class="note">Será redimensionada para caber no espaço. Tamanho máximo recomendado para logos: 200KB.</span>
             </div>
             <div class="form-group">
                 <label for="leftSponsorText">Texto (opcional):</label>
@@ -192,7 +192,7 @@
                 <label for="bottomSponsorLogo">Logo (arquivo de imagem):</label>
                 <input type="file" id="bottomSponsorLogo" accept="image/*">
                 <img id="bottomLogoPreview" class="preview-logo" src="" alt="Prévia da Logo Inferior" style="display: none;">
-                <span class="note">Será redimensionada para caber no espaço.</span>
+                <span class="note">Será redimensionada para caber no espaço. Tamanho máximo recomendado para logos: 200KB.</span>
             </div>
             <div class="form-group">
                 <label for="bottomSponsorText">Texto (opcional):</label>
@@ -217,7 +217,7 @@
         // Inicialize o Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const database = app.database();
-        const storage = app.storage(); // Inicializa o Storage
+        // REMOVIDO: const storage = app.storage();
         const sponsorStateRef = database.ref('sponsorOverlayState');
 
         const toggleVisibilityBtn = document.getElementById('toggleVisibilityBtn');
@@ -276,10 +276,12 @@
                         leftLogoPreview.style.display = 'block';
                     } else {
                         leftLogoPreview.style.display = 'none';
+                        leftSponsorLogoInput.value = ''; // Limpa o input de arquivo
                     }
                 } else {
                     leftSponsorTextarea.value = '';
                     leftLogoPreview.style.display = 'none';
+                    leftSponsorLogoInput.value = ''; // Limpa o input de arquivo
                 }
                 if (state.bottomSponsor) {
                     bottomSponsorTextarea.value = state.bottomSponsor.text || '';
@@ -288,10 +290,12 @@
                         bottomLogoPreview.style.display = 'block';
                     } else {
                         bottomLogoPreview.style.display = 'none';
+                        bottomSponsorLogoInput.value = ''; // Limpa o input de arquivo
                     }
                 } else {
                     bottomSponsorTextarea.value = '';
                     bottomLogoPreview.style.display = 'none';
+                    bottomSponsorLogoInput.value = ''; // Limpa o input de arquivo
                 }
 
             } else {
@@ -335,6 +339,16 @@
                 .catch(error => console.error('Erro ao atualizar visibilidade:', error));
         });
 
+        // Função para converter arquivo para Base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
         // Função para definir os dados do patrocinador
         async function setSponsor(slot) {
             let logoFile;
@@ -351,37 +365,39 @@
                 logoPreviewElement = bottomLogoPreview;
             }
 
-            let logoUrl = '';
+            let logoBase64 = '';
 
             // Se um novo arquivo de logo foi selecionado
             if (logoFile) {
-                const storageRef = storage.ref(`sponsor_logos/${slot}_${logoFile.name}`);
+                // Checagem de tamanho do arquivo (opcional, mas recomendado)
+                const maxSizeKB = 500; // Por exemplo, 500KB. Ajuste se precisar.
+                if (file.size > maxSizeKB * 1024) {
+                    alert(`O arquivo da logo é muito grande (${(file.size / 1024).toFixed(0)}KB). O limite recomendado é ${maxSizeKB}KB para evitar problemas com o Firebase Realtime Database.`);
+                    return; // Aborta a operação
+                }
                 try {
-                    const snapshot = await storageRef.put(logoFile);
-                    logoUrl = await snapshot.ref.getDownloadURL();
-                    console.log(`Logo do slot ${slot} enviada para o Storage:`, logoUrl);
+                    logoBase64 = await fileToBase64(logoFile);
+                    console.log(`Logo do slot ${slot} convertida para Base64.`);
                 } catch (error) {
-                    console.error(`Erro ao fazer upload da logo para o slot ${slot}:`, error);
-                    alert(`Erro ao fazer upload da logo para o slot ${slot}. Verifique o console.`);
+                    console.error(`Erro ao converter logo para Base64 para o slot ${slot}:`, error);
+                    alert(`Erro ao converter logo para o slot ${slot}. Verifique o console.`);
                     return;
                 }
             } else if (logoPreviewElement.src && logoPreviewElement.style.display !== 'none' && !logoPreviewElement.src.startsWith('blob:')) {
                 // Se não há novo arquivo, mas há uma logo sendo exibida (já do Firebase)
-                logoUrl = logoPreviewElement.src;
+                logoBase64 = logoPreviewElement.src;
             }
 
             const updateData = {};
             updateData[`${slot}Sponsor`] = {
-                logo: logoUrl,
+                logo: logoBase64, // Agora é a string Base64
                 text: textValue
             };
 
             sponsorStateRef.update(updateData)
                 .then(() => {
                     alert(`Patrocinador da ${slot === 'left' ? 'Barra Lateral Esquerda' : 'Barra Inferior'} atualizado com sucesso!`);
-                    // Limpar input de arquivo após upload bem-sucedido
-                    if (slot === 'left') leftSponsorLogoInput.value = '';
-                    else bottomSponsorLogoInput.value = '';
+                    // Não limpa o input de arquivo aqui para o usuário poder ver que a logo está definida
                 })
                 .catch(error => {
                     console.error(`Erro ao atualizar patrocinador do slot ${slot}:`, error);
@@ -390,4 +406,4 @@
         }
     </script>
 </body>
-  </html>
+</html>

@@ -53,10 +53,10 @@
             color: #666;
         }
 
-        input[type="text"],
-        input[type="number"],
+        input [type="text"],
+        input [type="number"],
         textarea,
-        input[type="file"] {
+        input [type="file"] {
             width: calc(100% - 20px);
             padding: 10px;
             border: 1px solid #ddd;
@@ -176,7 +176,7 @@
                 <label for="leftSponsorLogo">Logo (arquivo de imagem):</label>
                 <input type="file" id="leftSponsorLogo" accept="image/*">
                 <img id="leftLogoPreview" class="preview-logo" src="" alt="Prévia da Logo Esquerda" style="display: none;">
-                <span class="note">Será redimensionada para caber no espaço. Tamanho máximo recomendado para logos: 200KB.</span>
+                <span class="note">Será redimensionada para caber no espaço.</span>
             </div>
             <div class="form-group">
                 <label for="leftSponsorText">Texto (opcional):</label>
@@ -193,7 +193,7 @@
                 <label for="bottomSponsorLogo">Logo (arquivo de imagem):</label>
                 <input type="file" id="bottomSponsorLogo" accept="image/*">
                 <img id="bottomLogoPreview" class="preview-logo" src="" alt="Prévia da Logo Inferior" style="display: none;">
-                <span class="note">Será redimensionada para caber no espaço. Tamanho máximo recomendado para logos: 200KB.</span>
+                <span class="note">Será redimensionada para caber no espaço.</span>
             </div>
             <div class="form-group">
                 <label for="bottomSponsorText">Texto (opcional):</label>
@@ -236,7 +236,7 @@
 
         // Event Listeners para pré-visualização das logos selecionadas pelo usuário
         leftSponsorLogoInput.addEventListener('change', (event) => {
-            const file = event.target.files[0]; // Pega o primeiro arquivo selecionado
+            const file = event.target.files [0]; // Pega o primeiro arquivo selecionado
             if (file) {
                 const reader = new FileReader(); // Objeto para ler o conteúdo do arquivo
                 reader.onload = (e) => { // Quando o arquivo for lido
@@ -251,7 +251,7 @@
         });
 
         bottomSponsorLogoInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
+            const file = event.target.files [0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
@@ -373,13 +373,13 @@
 
                 reader.onerror = (error) => { // Função executada se houver um erro na leitura
                     console.error("fileToBase64: Erro ao ler arquivo:", error);
-                    alert("Erro ao ler o arquivo de imagem. Pode estar corrompido ou ser um formato inválido.");
+                    // Remove o alert de erro aqui
                     reject(error);
                 };
 
                 reader.onabort = () => { // Função executada se a leitura for abortada
                     console.warn("fileToBase64: Leitura do arquivo abortada.");
-                    alert("Leitura do arquivo de imagem foi abortada.");
+                    // Remove o alert de aborto aqui
                     reject("Leitura abortada.");
                 };
             });
@@ -393,11 +393,11 @@
 
             // Atribui os valores e referências corretos com base no 'slot' (left ou bottom)
             if (slot === 'left') {
-                logoFile = leftSponsorLogoInput.files[0];
+                logoFile = leftSponsorLogoInput.files [0];
                 textValue = leftSponsorTextarea.value;
                 logoPreviewElement = leftLogoPreview;
             } else { // slot === 'bottom'
-                logoFile = bottomSponsorLogoInput.files[0];
+                logoFile = bottomSponsorLogoInput.files [0];
                 textValue = bottomSponsorTextarea.value;
                 logoPreviewElement = bottomLogoPreview;
             }
@@ -406,20 +406,20 @@
 
             // Processa a logo: se um novo arquivo foi selecionado, converte para Base64
             if (logoFile) {
-                // Checagem de tamanho do arquivo para evitar estouro no Realtime Database
-                const maxSizeKB = 500; // Limite de 500KB. Imagens maiores podem causar problemas.
-                if (logoFile.size > maxSizeKB * 1024) {
-                    alert(`O arquivo da logo é muito grande (${(logoFile.size / 1024).toFixed(0)}KB). O limite recomendado é ${maxSizeKB}KB para evitar problemas com o Firebase Realtime Database.`);
-                    return; // Aborta a operação se o arquivo for muito grande
-                }
+                // Remove a checagem de tamanho do arquivo
+                // const maxSizeKB = 500;
+                // if (logoFile.size > maxSizeKB * 1024) {
+                //     alert(`O arquivo da logo é muito grande (${(logoFile.size / 1024).toFixed(0)}KB). O limite recomendado é ${maxSizeKB}KB para evitar problemas com o Firebase Realtime Database.`);
+                //     return; // Aborta a operação se o arquivo for muito grande
+                // }
                 try {
                     console.log(`setSponsor: Tentando converter logo para o slot ${slot}.`);
                     logoBase64 = await fileToBase64(logoFile); // Chama a função de conversão assíncrona
                     console.log(`Logo do slot ${slot} convertida para Base64.`);
                 } catch (error) {
                     console.error(`Erro ao converter logo para Base64 para o slot ${slot}:`, error);
-                    // Alerta mais específico para o usuário
-                    alert(`Erro ao converter logo para o slot ${slot}: ${error.message || error}. Por favor, tente com outro arquivo.`);
+                    // Mantém um alerta genérico, mas sem detalhes do erro de leitura
+                    alert(`Erro ao converter logo para o slot ${slot}. Por favor, tente com outro arquivo.`);
                     return; // Aborta a operação em caso de erro na conversão
                 }
             } else if (logoPreviewElement.src && logoPreviewElement.style.display !== 'none' && !logoPreviewElement.src.startsWith('blob:')) {

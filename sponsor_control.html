@@ -201,7 +201,7 @@
         </div>
         <div class="form-group">
             <label for="contactInfo">Contato e Atendimento (em destaque):</label>
-            <textarea id="contactInfo" placeholder="Ex: (XX) XXXX-XXXX, www.site.com.br, Seg-Mex 9h-18h"></textarea>
+            <textarea id="contactInfo" placeholder="Ex: (XX) XXXX-XXXX, www.site.com.br, Seg-Sex 9h-18h"></textarea>
         </div>
         <div class="form-group">
             <label for="backgroundImage">Imagem de Fundo da Barra (Unificada):</label>
@@ -375,12 +375,12 @@
             if (logoFile && logoFile.size > MAX_FILE_SIZE) {
                 alert(`O arquivo da logo é muito grande (max ${(MAX_FILE_SIZE / 1024).toFixed(0)}KB).`);
                 sponsorLogoInput.value = '';
-                return;
+                return; // Impede que a função continue se o arquivo for grande
             }
             if (backgroundImageFile && backgroundImageFile.size > MAX_FILE_SIZE) {
                 alert(`O arquivo de fundo é muito grande (max ${(MAX_FILE_SIZE / 1024).toFixed(0)}KB).`);
                 backgroundImageInput.value = '';
-                return;
+                return; // Impede que a função continue se o arquivo for grande
             }
 
             // Pega o estado atual para manter imagens se não forem alteradas
@@ -402,8 +402,11 @@
                 }
             };
             sponsorStateRef.update(updateData)
-                .then(() => alert('Barra de Patrocínio atualizada!'))
-                .catch(error => console.error('Erro ao atualizar barra de patrocínio:', error));
+                .then(() => alert('Barra de Patrocínio atualizada!')) // Mensagem de sucesso aqui
+                .catch(error => {
+                    console.error('Erro ao atualizar barra de patrocínio:', error);
+                    alert('Erro ao atualizar a barra de patrocínio. Verifique o console para mais detalhes.');
+                });
         }
     </script>
 </body>

@@ -69,7 +69,7 @@
         }
 
         .l-bar-bottom {
-            height: 100px; /* Altura da barra inferior (AJUSTAR SE NECESSÁRIO) */
+            height: 100px; /* Altura da barra inferior (AJUSTAR SE NECESSSÁRIO) */
             width: 100%; /* Largura total */
             position: absolute; /* Posição absoluta para a base */
             bottom: 0;
@@ -102,6 +102,7 @@
         }
 
     </style>
+    <!-- Importa as bibliotecas do Firebase App e Realtime Database. -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
@@ -109,25 +110,26 @@
     <div class="l-bar-container" id="lBarContainer">
         <div class="l-bar-left" id="lBarLeft">
             <div class="sponsor-content" id="leftSponsorContent">
-                </div>
+                <!-- Conteúdo do patrocinador da barra esquerda será inserido aqui pelo JavaScript -->
+            </div>
         </div>
         <div class="l-bar-bottom" id="lBarBottom">
             <div class="sponsor-content" id="bottomSponsorContent">
-                </div>
+                <!-- Conteúdo do patrocinador da barra inferior será inserido aqui pelo JavaScript -->
+            </div>
         </div>
     </div>
 
     <script>
-        // ** SEU FIREBASE CONFIG ESTÁ AQUI **
-        // Certifique-se de que estas são as suas credenciais EXATAS do projeto Firebase
+        // ** SEU FIREBASE CONFIG ESTÁ AQUI (ATUALIZADO!) **
         const firebaseConfig = {
-          apiKey: "AIzaSyC-***************************", // Sua API Key
-          authDomain: "***************.firebaseapp.com", // Seu Auth Domain
-          databaseURL: "https://***************-default-rtdb.firebaseio.com", // Sua Database URL
-          projectId: "***************", // Seu Project ID
-          storageBucket: "***************.appspot.com", // Seu Storage Bucket (mesmo que não usado, manter por completude)
-          messagingSenderId: "************", // Seu Messaging Sender ID
-          appId: "1:************:web:**********************" // Seu App ID
+          apiKey: "AIzaSyAFp_iujrtqjiTU5yq2yNSBIpwgjQZZyns",
+          authDomain: "aquilesplacarpro.firebaseapp.com",
+          databaseURL: "https://aquilesplacarpro-default-rtdb.firebaseio.com",
+          projectId: "aquilesplacarpro",
+          storageBucket: "aquilesplacarpro.firebasestorage.app",
+          messagingSenderId: "922321609151",
+          appId: "1:922321609151:web:ba51f5b21b322cf0a4c10a"
         };
 
         // Inicializa o Firebase com suas configurações

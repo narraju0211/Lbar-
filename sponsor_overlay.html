@@ -7,12 +7,14 @@
     <style>
         /* Variáveis CSS para fácil customização de cores, tamanhos e duração de animação */
         :root {
-            --l-bar-bg-color: rgba(0, 0, 0, 0.7); /* Fundo preto semi-transparente */
+            --l-bar-bg-color: rgba(0, 0, 0, 0.7); /* Fundo preto semi-transparente das barras */
             --l-bar-border-color: #00f; /* Borda azul neon (exemplo) */
             --text-color: #fff; /* Cor do texto padrão */
-            --logo-max-height-left: 80px; /* Altura máxima da logo na barra lateral */
-            --logo-max-height-bottom: 70px; /* Altura máxima da logo na barra inferior */
+            --logo-bg-color: rgba(255, 0, 0, 0.8); /* Cor de fundo para o bloco da logo (vermelho semi-transparente) */
+            --text-bg-color: rgba(200, 0, 0, 0.8); /* Cor de fundo para o bloco de texto (vermelho um pouco mais escuro) */
+            --rounded-border-radius: 8px; /* Borda arredondada para os blocos */
             --animation-duration: 0.5s; /* Duração das animações de fade in/out */
+            --main-font-size: 1.2em; /* Tamanho da fonte principal para texto */
         }
 
         body {
@@ -40,6 +42,7 @@
             display: flex; /* Para organizar as barras lateral e inferior */
             justify-content: flex-start;
             align-items: flex-end;
+            z-index: 100; /* Garante que fique acima de outros elementos do OBS */
         }
 
         .l-bar-container.active {
@@ -60,59 +63,106 @@
         }
 
         .l-bar-left {
-            width: 200px; /* Largura da barra lateral (AJUSTAR SE NECESSÁRIO) */
-            height: calc(100% - 100px); /* Altura: 100% da tela menos a altura da barra inferior (AJUSTAR SE NECESSÁRIO) */
+            width: 280px; /* Largura da barra lateral (AJUSTADO: AUMENTADO para mais espaço) */
+            height: calc(100% - 130px); /* Altura: 100% da tela menos a altura da barra inferior (AJUSTADO) */
             position: absolute; /* Posição absoluta para o canto superior esquerdo */
             top: 0;
             left: 0;
             flex-direction: column; /* Conteúdo vertical na lateral */
-            padding: 15px 5px; /* Padding interno */
+            padding: 10px; /* Padding interno */
+            gap: 15px; /* Espaço entre os blocos (logo e texto) */
         }
 
         .l-bar-bottom {
-            height: 100px; /* Altura da barra inferior (AJUSTAR SE NECESSSÁRIO) */
+            height: 130px; /* Altura da barra inferior (AJUSTADO: AUMENTADO) */
             width: 100%; /* Largura total */
             position: absolute; /* Posição absoluta para a base */
             bottom: 0;
             left: 0;
-            padding: 5px 15px; /* Padding interno */
+            padding: 10px 20px; /* Padding interno */
+            gap: 15px; /* Espaço entre os blocos (logo e texto) */
         }
 
-        /* Estilos para o conteúdo dos patrocinadores (logo e texto) */
-        .sponsor-content {
+        /* Estilos para os blocos de conteúdo do patrocinador */
+        .sponsor-block {
+            background-color: var(--logo-bg-color); /* Fundo padrão para o bloco */
+            border-radius: var(--rounded-border-radius);
+            padding: 8px 15px; /* Padding dentro do bloco */
             display: flex;
-            flex-direction: column; /* Para empilhar logo e texto */
             justify-content: center;
             align-items: center;
-            width: 100%;
-            height: 100%; /* Ocupa todo o espaço disponível na barra */
-            gap: 10px; /* Espaço entre logo e texto */
+            box-sizing: border-box;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); /* Sombra para o bloco */
             text-align: center;
-            font-size: 1.2em;
-            text-shadow: 0 0 5px rgba(0,0,0,0.8); /* Sombra para o texto */
+            color: var(--text-color);
+            line-height: 1.2;
         }
 
-        .sponsor-content img {
-            max-width: 90%; /* Largura máxima da imagem dentro do seu contêiner */
+        .sponsor-block.logo-block {
+            flex-grow: 0; /* Não cresce para deixar o texto crescer */
+            max-width: 95%; /* Limita a largura dentro da barra */
+        }
+
+        .sponsor-block.text-block {
+            background-color: var(--text-bg-color); /* Cor diferente para o bloco de texto */
+            flex-grow: 1; /* Permite que o texto preencha o espaço restante */
+            width: 100%; /* Ocupa a largura total disponível */
+            overflow: hidden; /* Garante que o texto não vaze, se for muito longo */
+        }
+
+        /* Estilos para a imagem dentro do bloco de logo */
+        .sponsor-block img {
+            max-height: 100%; /* Ocupa a altura total do bloco */
+            max-width: 100%; /* Ocupa a largura total do bloco */
             object-fit: contain; /* Garante que a imagem seja contida sem cortar */
+            display: block; /* Remove espaço extra abaixo da imagem */
         }
 
-        .l-bar-left .sponsor-content img {
-            max-height: var(--logo-max-height-left); /* Altura máxima para logo na barra lateral */
+        /* Estilos para o texto dentro do bloco de texto */
+        .sponsor-block .sponsor-text {
+            font-size: var(--main-font-size); /* Tamanho de fonte baseado na variável */
+            font-weight: bold; /* Texto em negrito */
+            white-space: normal; /* Permite quebrar linha */
+            word-break: break-word; /* Força a quebra de palavras longas */
+            overflow: hidden; /* Esconde o texto se ele ainda vazar */
+            text-overflow: ellipsis; /* Adiciona '...' se o texto for cortado em uma única linha, se for o caso */
+            /* Para multilinhas, text-overflow: ellipsis não funciona bem. Flexbox já ajuda */
         }
 
-        .l-bar-bottom .sponsor-content img {
-            max-height: var(--logo-max-height-bottom); /* Altura máxima para logo na barra inferior */
+        /* Ajustes específicos para a barra lateral esquerda */
+        .l-bar-left .sponsor-block.logo-block {
+            height: 100px; /* Altura fixa para o bloco de logo na esquerda */
+            padding: 5px;
+        }
+        .l-bar-left .sponsor-block.text-block {
+            min-height: 50px; /* Altura mínima para o bloco de texto na esquerda */
+            display: flex; /* Para centralizar o texto verticalmente */
+            align-items: center;
+            justify-content: center;
         }
 
-        .sponsor-text {
-            font-size: 1.1em; /* Tamanho da fonte para o texto do patrocinador */
-            word-break: break-word; /* Permite quebrar palavras longas para caber no espaço */
-            padding: 0 5px;
-            max-height: 100%; /* Ocupa toda a altura disponível */
-            overflow: hidden; /* Esconde texto que vaze */
+        /* Ajustes específicos para a barra inferior */
+        .l-bar-bottom .sponsor-block {
+            height: 100%; /* Ocupa a altura total da barra */
+            max-width: 50%; /* Divide a largura da barra */
         }
 
+        .l-bar-bottom {
+            flex-direction: row; /* Coloca os blocos lado a lado na barra inferior */
+            justify-content: space-around; /* Distribui o espaço entre eles */
+            align-items: center;
+        }
+        .l-bar-bottom .sponsor-block.logo-block {
+            width: 45%; /* Largura para o bloco de logo */
+            padding: 5px;
+        }
+        .l-bar-bottom .sponsor-block.text-block {
+            width: 45%; /* Largura para o bloco de texto */
+            min-height: 50px; /* Altura mínima */
+            display: flex; /* Para centralizar o texto verticalmente */
+            align-items: center;
+            justify-content: center;
+        }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -120,13 +170,9 @@
 <body>
     <div class="l-bar-container" id="lBarContainer">
         <div class="l-bar-left" id="lBarLeft">
-            <div class="sponsor-content" id="leftSponsorContent">
-                </div>
-        </div>
+            </div>
         <div class="l-bar-bottom" id="lBarBottom">
-            <div class="sponsor-content" id="bottomSponsorContent">
-                </div>
-        </div>
+            </div>
     </div>
 
     <script>
@@ -174,40 +220,53 @@
                 lBarContainer.classList.remove('active');
             }
 
-            const leftSponsorContent = document.getElementById('leftSponsorContent');
-            const bottomSponsorContent = document.getElementById('bottomSponsorContent');
+            const leftSponsorBar = document.getElementById('lBarLeft');
+            const bottomSponsorBar = document.getElementById('lBarBottom');
 
-            // Renderiza o conteúdo para a barra lateral esquerda (logo e/ou texto)
-            leftSponsorContent.innerHTML = ''; // Limpa o conteúdo anterior
+            leftSponsorBar.innerHTML = ''; // Limpa o conteúdo anterior
+            bottomSponsorBar.innerHTML = ''; // Limpa o conteúdo anterior
+
+            // Renderiza o conteúdo para a barra lateral esquerda (logo e/ou texto em blocos)
             if (sponsorOverlayState.leftSponsor) {
                 if (sponsorOverlayState.leftSponsor.logo) {
+                    const logoBlock = document.createElement('div');
+                    logoBlock.className = 'sponsor-block logo-block';
                     const img = document.createElement('img');
                     img.src = sponsorOverlayState.leftSponsor.logo;
                     img.alt = 'Logo Patrocinador Esquerda';
-                    leftSponsorContent.appendChild(img);
+                    logoBlock.appendChild(img);
+                    leftSponsorBar.appendChild(logoBlock);
                 }
                 if (sponsorOverlayState.leftSponsor.text) {
+                    const textBlock = document.createElement('div');
+                    textBlock.className = 'sponsor-block text-block';
                     const span = document.createElement('span');
                     span.className = 'sponsor-text';
                     span.textContent = sponsorOverlayState.leftSponsor.text;
-                    leftSponsorContent.appendChild(span);
+                    textBlock.appendChild(span);
+                    leftSponsorBar.appendChild(textBlock);
                 }
             }
 
-            // Renderiza o conteúdo para a barra inferior (logo e/ou texto)
-            bottomSponsorContent.innerHTML = ''; // Limpa o conteúdo anterior
+            // Renderiza o conteúdo para a barra inferior (logo e/ou texto em blocos)
             if (sponsorOverlayState.bottomSponsor) {
                 if (sponsorOverlayState.bottomSponsor.logo) {
+                    const logoBlock = document.createElement('div');
+                    logoBlock.className = 'sponsor-block logo-block';
                     const img = document.createElement('img');
                     img.src = sponsorOverlayState.bottomSponsor.logo;
                     img.alt = 'Logo Patrocinador Inferior';
-                    bottomSponsorContent.appendChild(img);
+                    logoBlock.appendChild(img);
+                    bottomSponsorBar.appendChild(logoBlock);
                 }
                 if (sponsorOverlayState.bottomSponsor.text) {
+                    const textBlock = document.createElement('div');
+                    textBlock.className = 'sponsor-block text-block';
                     const span = document.createElement('span');
                     span.className = 'sponsor-text';
                     span.textContent = sponsorOverlayState.bottomSponsor.text;
-                    bottomSponsorContent.appendChild(span);
+                    textBlock.appendChild(span);
+                    bottomSponsorBar.appendChild(textBlock);
                 }
             }
         }
